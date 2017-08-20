@@ -1,0 +1,8 @@
+<h1>Card List Component</h1>
+<div ng-repeat="card in $ctrl.data.cards">
+	<button type="button" ng-click="$ctrl.changeName()">Change the Card Name!</button>
+	<ul>
+		<li>Name: {{card.name}}</li>
+		<li>Card Type: {{card.cardType}}</li>
+	</ul>
+</div>
