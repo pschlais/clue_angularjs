@@ -227,8 +227,10 @@ class Hand {
 			//get number of unknown cards from hand size and known cards (nHand)
 			let nHand = this.handSize - this.countKnownCards();
 
-			//if all cards in hand are known, the still-unknown cards can't be in the hand.
-			if (nHand === 0) {
+			//If all cards in hand are known, the still-unknown cards can't be in the hand.
+			//This should NOT be entered if there are no unknown cards, since there is no
+			//new info to produce (hand is fully defined).
+			if (nHand === 0 && unknownCards.length > 0) {
 				unknownCards.forEach(function(card) {
 					self.updateChecklist(card, CardHeld.NO);
 				});
@@ -441,6 +443,7 @@ class Solution extends Hand {
 
 		let cardTypes = [CardType.PERSON, CardType.WEAPON, CardType.ROOM];
 		let self = this;
+		let deducedCards = [];
 
 		//loop through the three card types
 		cardTypes.forEach(function(cardType) {
@@ -456,11 +459,16 @@ class Solution extends Hand {
 						solCard = card;
 					}
 				});
-				//add card to Solution "hand"
+				//add card to Solution "hand", deduced cards
 				self.addKnownCard(solCard);
+				deducedCards.push(solCard);
 			}
 
 		});
+
+		//return object with deduced cards, if applicable
+		return {newInfo: (deducedCards.length > 0),
+				deducedCards: deducedCards};
 		
 
 	}
@@ -710,19 +718,22 @@ var ClueUtil = (function() {
 		//	-guess: Guess() object
 		//	-allHands: [Hand()] containing all hands, order unimportant
 		//  -solution: Solution()
+		//
+		//NOTE: This function DOES NOT deduce solution cards. deduceCardsByNos() contains
+		//		that functionality. It only deduces the location of cards in players' hands.
 		
 		//guess cards
 		let guessCardsToClassify = [guess.person, guess.weapon, guess.room];
 		let guessCardsToLoop = guessCardsToClassify.slice(); //create shallow copy, not alias
 
-		//if no one shows a card, the "show hand" is the solution in terms of
-		//
+		//alias for common check (was the showing hand a Hand(), i.e. not null?)
+		let showHandNotNull = guess.showHand !== null;
 
 		//count number of cards in guess where holder is known and not the showing player
 		let n_known_shower = 0;
 		guessCardsToLoop.forEach(function(card){
-			// if(guess.showHand !== null && guess.showHand.hasCard(card)){
-			if(guess.showHand.hasCard(card)){
+			
+			if(showHandNotNull && guess.showHand.hasCard(card)){
 				//increment counter, remove current card from list of cards to classify
 				n_known_shower++;
 				guessCardsToClassify.splice(guessCardsToClassify.indexOf(card),1);
@@ -744,7 +755,7 @@ var ClueUtil = (function() {
 		guessCardsToLoop = guessCardsToClassify.slice(); //reset loop with remaining cards
 		let n_knownNo = 0;
 		guessCardsToLoop.forEach(function(card){
-			if(guess.showHand.checkCardStatus(card) === CardHeld.NO) {
+			if(showHandNotNull && guess.showHand.checkCardStatus(card) === CardHeld.NO) {
 				//increment counter, remove current card from list of cards to classify
 				n_knownNo++;
 				guessCardsToClassify.splice(guessCardsToClassify.indexOf(card),1);
@@ -773,15 +784,17 @@ var ClueUtil = (function() {
 					"none of guessCard.isHolderKnown() for person, weapon, or room returned " +
 					"'false'.");
 			}
-			//apply new knowledge - to solution if no one shows, to hand if someone shows
-			if (guess.showHand === null) {
-				solution.addKnownCard(deducedCard);
-			} else {
+			//apply new knowledge - to hand if someone shows
+			if (showHandNotNull) {
 				guess.showHand.addKnownCard(deducedCard);
+				newKnownCardUpdate(allHands, solution, deducedCard);
+				//return successful deduction flag
+				return true;
+			} else {
+				//no deductions to make **IN THIS FUNCTION** for no player showing a card
+				return false;
 			}
-			newKnownCardUpdate(allHands, solution, deducedCard);
-			//return successful deduction flag
-			return true;
+			
 		}
 		// --- SUCESS CASE 2: 2 cards are known not to be in the showing player. Remaining card can
 		//				be deduced to be in the showing player's hand.
@@ -799,15 +812,16 @@ var ClueUtil = (function() {
 					"none of showHand.checkCardStatus() for person, weapon, or room returned " +
 					"'CardHeld.UNKNOWN'.");
 			}
-			//apply new knowledge - to solution if no one shows, to hand if someone shows
-			if (guess.showHand === null) {
-				solution.addKnownCard(deducedCard);
-			} else {
+			//apply new knowledge - to hand if someone shows
+			if (showHandNotNull) {
 				guess.showHand.addKnownCard(deducedCard);
+				newKnownCardUpdate(allHands, solution, deducedCard);
+				//return successful deduction flag
+				return true;
+			} else {
+				//no deductions to make **IN THIS FUNCTION** for no player showing a card
+				return false;
 			}
-			newKnownCardUpdate(allHands, solution, deducedCard);
-			//return successful deduction flag
-			return true;
 		}
 		// --- SUCCESS CASE 3: 1 card known not to be in showing player's hand, 1 card known to be in
 		//				another player's hand. Remaining card can be deduced to be in the 
@@ -829,20 +843,22 @@ var ClueUtil = (function() {
 					"none of the person, weapon, or room guess cards were both not held by a hand " +
 					"and had a status of 'CardHeld.UNKNOWN' for the showing player's hand.");
 			}
-			//apply new knowledge - to solution if no one shows, to hand if someone shows
-			if (guess.showHand === null) {
-				solution.addKnownCard(deducedCard);
-			} else {
+			//apply new knowledge - to hand if someone shows
+			if (showHandNotNull) {
 				guess.showHand.addKnownCard(deducedCard);
+				newKnownCardUpdate(allHands, solution, deducedCard);
+				//return successful deduction flag
+				return true;
+			} else {
+				//no deductions to make **IN THIS FUNCTION** for no player showing a card
+				return false;
 			}
-			newKnownCardUpdate(allHands, solution, deducedCard);
-			//return successful deduction flag
-			return true;
 		}
 		// SPECIAL CASE 1: Showing player only has 1 remaining unknown card.
 		//				   This means the remaining card must be in the guess. Set all
 		//				   other cards to CardHeld.NO.
-		else if (guess.showHand.handSize - guess.showHand.countKnownCards() === 1) {
+		else if (showHandNotNull && 
+				 guess.showHand.handSize - guess.showHand.countKnownCards() === 1) {
 			let guessCards = [guess.person, guess.weapon, guess.room];
 			//loop over all game cards, track if update was made
 			let newInfo = false;
@@ -857,10 +873,10 @@ var ClueUtil = (function() {
 			});
 			//return if new info was produced
 			return newInfo;
+		} else {
+			// --- ALL OTHER CASES: not enough info to deduce a new known card.
+			return false;
 		}
-
-		// --- ALL OTHER CASES: not enough info to deduce a new known card.
-		return false;
 	};
 
 	let deduceCardByNos = function(allHands, solution, cardsToCheck) {

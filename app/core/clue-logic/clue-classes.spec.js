@@ -935,9 +935,12 @@ describe('Class', function(){
 				sol.updateChecklist(pCards[0], CardHeld.NO);
 				sol.updateChecklist(pCards[1], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check person solution pCards[2] has been deduced
 				expect(sol.person).toBe(pCards[2]);
+				expect(dedInfo.newInfo).toBe(true);
+				expect(dedInfo.deducedCards.length).toBe(1);
+				expect(dedInfo.deducedCards[0]).toBe(pCards[2]);
 			});
 
 			it("does not deduce a person solution when multiple are still unknown", function() {
@@ -945,9 +948,10 @@ describe('Class', function(){
 				//set the status of one person card to CardHeld.NO
 				sol.updateChecklist(pCards[0], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check person solution pCards[2] has been deduced
 				expect(sol.person).toBe(null);
+				expect(dedInfo.newInfo).toBe(false);
 			});
 
 			it("deducts the correct weapon as the only unknown remaining weapon in play", function() {
@@ -956,9 +960,12 @@ describe('Class', function(){
 				sol.updateChecklist(wCards[0], CardHeld.NO);
 				sol.updateChecklist(wCards[1], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check weapon solution wCards[2] has been deduced
 				expect(sol.weapon).toBe(wCards[2]);
+				expect(dedInfo.newInfo).toBe(true);
+				expect(dedInfo.deducedCards.length).toBe(1);
+				expect(dedInfo.deducedCards[0]).toBe(wCards[2]);
 			});
 
 			it("does not deduce a weapon solution when multiple are still unknown", function() {
@@ -966,9 +973,11 @@ describe('Class', function(){
 				//set the status of one weapon card to CardHeld.NO
 				sol.updateChecklist(wCards[0], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check weapon solution wCards[2] has been deduced
 				expect(sol.weapon).toBe(null);
+				expect(dedInfo.newInfo).toBe(false);
+
 			});
 
 			it("deducts the correct room as the only unknown remaining room in play", function() {
@@ -977,9 +986,12 @@ describe('Class', function(){
 				sol.updateChecklist(rCards[0], CardHeld.NO);
 				sol.updateChecklist(rCards[1], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check room solution rCards[2] has been deduced
 				expect(sol.room).toBe(rCards[2]);
+				expect(dedInfo.newInfo).toBe(true);
+				expect(dedInfo.deducedCards.length).toBe(1);
+				expect(dedInfo.deducedCards[0]).toBe(rCards[2]);
 			});
 
 			it("does not deduce a room solution when multiple are still unknown", function() {
@@ -987,9 +999,10 @@ describe('Class', function(){
 				//set the status of one room card to CardHeld.NO
 				sol.updateChecklist(rCards[0], CardHeld.NO);
 
-				sol.deduceCardsByRemaining();
+				let dedInfo = sol.deduceCardsByRemaining();
 				//check room solution rCards[2] has been deduced
 				expect(sol.room).toBe(null);
+				expect(dedInfo.newInfo).toBe(false);
 			});
 
 		});
@@ -1604,6 +1617,8 @@ describe('IIFE Module', function() {
 				describe("1 unknown card, 2 are known in player's hands, no one shows", function(){
 					//hand1 guesses, no one shows.
 					//Guesses two cards known to be in hand1.
+					//THIS FUNCTION SHOULD DO NOTHING: deductions to solution are only
+					//done in ClueUtil.deduceCardByNos().
 					let guess, personGuess, weaponGuess, roomGuess, newInfo;
 					
 					beforeEach(function() {
@@ -1620,22 +1635,8 @@ describe('IIFE Module', function() {
 						newInfo = ClueUtil.deduceCardSingleGuess(guess, allHands, sol);
 					});
 
-					xit("and places the unknown card into the solution", function(){
-						expect(sol.hasCard(unknownCard)).toBe(true);
-					});
-
-					xit("and deduces the correct type of solution", function(){
-						expect(sol.isPersonKnown()).toBe(true);
-					});
-
-					xit("and sets all other hands status to 'NO' for the unknown card", function(){
-						expect(hand0.checkCardStatus(unknownCard)).toBe(CardHeld.NO);
-						expect(hand1.checkCardStatus(unknownCard)).toBe(CardHeld.NO);
-						expect(hand2.checkCardStatus(unknownCard)).toBe(CardHeld.NO);
-					});
-
-					xit("and indicates that new information has been found", function() {
-						expect(newInfo).toBe(true);
+					it("and indicates that no new information has been found", function() {
+						expect(newInfo).toBe(false);
 					});
 				});
 
@@ -1826,6 +1827,7 @@ describe('IIFE Module', function() {
 			let gameCards;
 			let allHands, solHand;
 			let solPerson, solWeapon, solRoom;
+			let player0cards, player1cards, player2cards, solutioncards;
 
 			beforeEach(function(){
 				/*set up game state:
@@ -1838,17 +1840,17 @@ describe('IIFE Module', function() {
 				gameCards = ClueUtil._generateTestCards(4,4,4);
 
 				//generate players
-				let player0cards = [gameCards.personCards[0],
+				player0cards = [gameCards.personCards[0],
 									gameCards.weaponCards[0],
 									gameCards.roomCards[0]];
 				player0 = new Player("Player0", gameCards.allCards, true, false, player0cards);
 
-				let player1cards = [gameCards.personCards[1],
+				player1cards = [gameCards.personCards[1],
 									gameCards.weaponCards[1],
 									gameCards.roomCards[1]];
 				player1 = new Player("Player1", gameCards.allCards, false, false, player1cards);
 
-				let player2cards = [gameCards.personCards[2],
+				player2cards = [gameCards.personCards[2],
 									gameCards.weaponCards[2],
 									gameCards.roomCards[2]];
 				player2 = new Player("Player2", gameCards.allCards, false, false, player2cards);
@@ -1859,7 +1861,7 @@ describe('IIFE Module', function() {
 				solPerson = gameCards.personCards[3];
 				solWeapon = gameCards.weaponCards[3];
 				solRoom = gameCards.roomCards[3];
-				let solutioncards = [solPerson, solWeapon, solRoom];
+				solutioncards = [solPerson, solWeapon, solRoom];
 				playerSol = new Player("Solution", gameCards.allCards, false, true, solutioncards);
 				
 				//store hands of players
@@ -1867,7 +1869,7 @@ describe('IIFE Module', function() {
 				solHand = playerSol.hand;
 
 				//apply main player known cards to other players
-				ClueUtil.newKnownCardUpdate(player0.hand, solHand, player0.heldCards);
+				ClueUtil.newKnownCardUpdate(allHands, solHand, player0.heldCards);
 			});
 
 			describe("deduces the solution directly", function(){
@@ -1891,25 +1893,373 @@ describe('IIFE Module', function() {
 						ClueUtil.processGuesses(allHands, solHand, guesses, gameCards.allCards);
 					});
 
-					xit("identifying the full solution", function(){
+					it("identifying the full solution", function(){
 						expect(solHand.isFullSolutionKnown()).toBe(true);
 					});
 
-					xit("identifying the correct person card", function(){});
-					xit("identifying the correct weapon card", function(){});
-					xit("identifying the correct room card", function(){});
-					xit("identifying no cards are known in player1's hand", function(){});
-					xit("identifying the cards known not to be in player1's hand", function(){});
-					xit("identifying no cards are known in player2's hand", function(){});
-					xit("identifying the cards known not to be in player2's hand", function(){});
+					it("identifying the correct person card", function(){
+						expect(solHand.person).toBe(solPerson);
+					});
+
+					it("identifying the correct weapon card", function(){
+						expect(solHand.weapon).toBe(solWeapon);
+					});
+
+					it("identifying the correct room card", function(){
+						expect(solHand.room).toBe(solRoom);
+					});
+
+					it("identifying no cards are known in player1's hand", function(){
+						expect(player1.hand.countKnownCards()).toBe(0);
+					});
+
+					it("identifying the cards known not to be in player1's hand", function(){
+						//solution cards, cards held by main player are known not to be in player1 hand
+						expect(player1.hand.checkCardStatus(solPerson)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(solWeapon)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(solRoom)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[0])).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[1])).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[2])).toBe(CardHeld.NO);
+					});
+
+					it("identifying no cards are known in player2's hand", function(){
+						expect(player2.hand.countKnownCards()).toBe(0);
+					});
+
+					it("identifying the cards known not to be in player2's hand", function(){
+						//solution cards, cards held by main player are known not to be in player2 hand
+						expect(player2.hand.checkCardStatus(solPerson)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(solWeapon)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(solRoom)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[0])).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[1])).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[2])).toBe(CardHeld.NO);
+					});
 				});
 
-				describe("for main-player individual guesses of the solution cards by", function(){});
+				describe("for main-player individual guesses of the solution cards by", function(){
+					//block variables
+					let guesses;
 
-				describe("for main-player individual guesses of all non-solution cards by", function(){});
+					beforeEach(function(){
+						//only one guess: all are in solution
+						guesses = [];
+						guesses.push(ClueUtil._simulateGuess(player0, solPerson, player0cards[1],
+												player0cards[2], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, player0cards[0], solWeapon,
+												player0cards[2], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, player0cards[0], player0cards[1],
+												solRoom, allPlayers));
+
+						//apply No's from all guesses
+						guesses.forEach(function(guess){
+							ClueUtil.applyGuessToHands(guess, allHands, solHand);
+						});
+
+						//process guesses
+						ClueUtil.processGuesses(allHands, solHand, guesses, gameCards.allCards);
+					});
+
+					it("identifying the full solution", function(){
+						expect(solHand.isFullSolutionKnown()).toBe(true);
+					});
+
+					it("identifying the correct person card", function(){
+						expect(solHand.person).toBe(solPerson);
+					});
+
+					it("identifying the correct weapon card", function(){
+						expect(solHand.weapon).toBe(solWeapon);
+					});
+
+					it("identifying the correct room card", function(){
+						expect(solHand.room).toBe(solRoom);
+					});
+
+					it("identifying no cards are known in player1's hand", function(){
+						expect(player1.hand.countKnownCards()).toBe(0);
+					});
+
+					it("identifying the cards known not to be in player1's hand", function(){
+						//solution cards, cards held by main player are known not to be in player1 hand
+						expect(player1.hand.checkCardStatus(solPerson)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(solWeapon)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(solRoom)).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[0])).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[1])).toBe(CardHeld.NO);
+						expect(player1.hand.checkCardStatus(player0cards[2])).toBe(CardHeld.NO);
+					});
+
+					it("identifying no cards are known in player2's hand", function(){
+						expect(player2.hand.countKnownCards()).toBe(0);
+					});
+
+					it("identifying the cards known not to be in player2's hand", function(){
+						//solution cards, cards held by main player are known not to be in player2 hand
+						expect(player2.hand.checkCardStatus(solPerson)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(solWeapon)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(solRoom)).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[0])).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[1])).toBe(CardHeld.NO);
+						expect(player2.hand.checkCardStatus(player0cards[2])).toBe(CardHeld.NO);
+					});
+				});
+
+				describe("for main-player individual guesses of all non-solution cards by", function(){
+					//block variables
+					let guesses;
+
+					beforeEach(function(){
+						//only one guess: all are in solution
+						guesses = [];
+						//isolate player1 cards
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[1], gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[1], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[0], gameCards.roomCards[1], allPlayers));
+
+						//isolate player2 cards
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[2], gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[2], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers));
+
+						//apply No's from all guesses
+						guesses.forEach(function(guess){
+							ClueUtil.applyGuessToHands(guess, allHands, solHand);
+						});
+
+						//process guesses
+						ClueUtil.processGuesses(allHands, solHand, guesses, gameCards.allCards);
+					});
+
+					it("identifying the full solution", function(){
+						expect(solHand.isFullSolutionKnown()).toBe(true);
+					});
+
+					it("identifying the correct person card", function(){
+						expect(solHand.person).toBe(solPerson);
+					});
+
+					it("identifying the correct weapon card", function(){
+						expect(solHand.weapon).toBe(solWeapon);
+					});
+
+					it("identifying the correct room card", function(){
+						expect(solHand.room).toBe(solRoom);
+					});
+
+					it("identifying 3 cards are known in player1's hand, none are unknown", function(){
+						expect(player1.hand.countKnownCards()).toBe(3);
+						expect(player1.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the cards to be in player1's hand", function(){
+						expect(player1.hand.hasCard(gameCards.personCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.weaponCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.roomCards[1])).toBe(true);
+					});
+
+					it("identifying 3 cards are known in player2's hand, none are unknown", function(){
+						expect(player1.hand.countKnownCards()).toBe(3);
+						expect(player1.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the cards to be in player2's hand", function(){
+						expect(player2.hand.hasCard(gameCards.personCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.weaponCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.roomCards[2])).toBe(true);
+					});
+				});
 			});
 
-			describe("deduces the solution indirectly", function(){});
+			describe("deduces the solution indirectly", function(){
+					
+				describe("for another player isolating a different player's cards by", function(){
+					//block variables
+					let guesses;
+
+					beforeEach(function(){
+						/*Cards that were shown from another player's guess are deduced
+							based on saying 'no' to main player's guess.
+
+							Player order: Player0 (main) --> Player1 --> Player2
+							Guess order:
+								(1) Player2, isolate person from player1 --> player1 shows
+								(2) Player2, isolate weapon from player1 --> player1 shows
+								(3) Player2, isolate room from player1 --> player1 shows
+								(4) Player0, isolate person from player2 --> player2 shows
+								(5) Player2, isolate weapon from player2 --> player2 shows
+								(6) Player2, isolate room from player2 --> player2 shows
+
+							At this point, the contents of Player2's hand can be determined
+							based on Player1's guesses, and therefore the solution, since
+							all 3 cards in all 3 hands are known.
+						*/
+
+						guesses = [];
+						//player2 guesses to isolate player1 cards
+						guesses.push(ClueUtil._simulateGuess(player2, 
+							gameCards.personCards[1], gameCards.weaponCards[2], gameCards.roomCards[2], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player2, 
+							gameCards.personCards[2], gameCards.weaponCards[1], gameCards.roomCards[2], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player2, 
+							gameCards.personCards[2], gameCards.weaponCards[2], gameCards.roomCards[1], allPlayers));
+
+						//player0 (main) guesses to isolate player2 cards
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[2], gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[2], gameCards.roomCards[0], allPlayers));
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers));
+
+						//apply No's from all guesses
+						guesses.forEach(function(guess){
+							ClueUtil.applyGuessToHands(guess, allHands, solHand);
+						});
+
+						//process guesses
+						ClueUtil.processGuesses(allHands, solHand, guesses, gameCards.allCards);
+					});
+
+					it("identifying the full solution", function(){
+						expect(solHand.isFullSolutionKnown()).toBe(true);
+					});
+
+					it("identifying the correct person card", function(){
+						expect(solHand.person).toBe(solPerson);
+					});
+
+					it("identifying the correct weapon card", function(){
+						expect(solHand.weapon).toBe(solWeapon);
+					});
+
+					it("identifying the correct room card", function(){
+						expect(solHand.room).toBe(solRoom);
+					});
+
+					it("identifying 3 cards are known in player1's hand, none are unknown", function(){
+						expect(player1.hand.countKnownCards()).toBe(3);
+						expect(player1.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the cards to be in player1's hand", function(){
+						expect(player1.hand.hasCard(gameCards.personCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.weaponCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.roomCards[1])).toBe(true);
+					});
+
+					it("identifying 3 cards are known in player2's hand, none are unknown", function(){
+						expect(player1.hand.countKnownCards()).toBe(3);
+						expect(player1.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the cards to be in player2's hand", function(){
+						expect(player2.hand.hasCard(gameCards.personCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.weaponCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.roomCards[2])).toBe(true);
+					});
+				});
+
+				describe("for other players isolating the solution cards by", function(){
+					//block variables
+					let guesses;
+
+					beforeEach(function(){
+						/*Guesses exposing solution cards from other player guesses are deduced
+							based on saying 'no' to main player's guess.
+
+							Player order: Player0 (main) --> Player1 --> Player2
+							Guess order:
+								(1) Player2, isolate person solution
+								(2) Player1, isolate weapon and room solution
+								(3) Player0 (main), determines Player2 had room in guess
+								(4) Player0 (main), determines Player2 had weapon in guess
+								(5) Player0 (main), determines Player1 does not have weapon or room
+									by asking for weapon + room solution, but player2's person card
+									is shown
+
+							At this point, the solution is known. All cards in all hands should be known because:
+							(1) 3 solution cards known
+							(2) 3 main player cards are known
+							(3) 3 player2 cards have been shown directly to main player
+							(4) No player1 cards were shown, but only 3 remaining cards are unknown
+								in the game, so they must all be in player1's hand.
+						*/
+
+						guesses = [];
+						//(1) player2 guesses to isolate person solution
+						guesses.push(ClueUtil._simulateGuess(player2, 
+							solPerson, gameCards.weaponCards[2], gameCards.roomCards[2], allPlayers));
+						//(2) player1 guesses to isolate weapon, room solutions
+						guesses.push(ClueUtil._simulateGuess(player1, 
+							gameCards.personCards[1], solWeapon, solRoom, allPlayers));
+						//(3) player0 (main) guesses to determine player2 had room
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers));
+						//(4) player0 (main) guesses to determine player2 had weapon
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[0], gameCards.weaponCards[2], gameCards.roomCards[0], allPlayers));
+						//(5) player0 (main) guesses to determine player1 does not have weapon/room solutions,
+						//	  player2 shows person card
+						guesses.push(ClueUtil._simulateGuess(player0, 
+							gameCards.personCards[2], solWeapon, solRoom, allPlayers));
+
+						//apply No's from all guesses
+						guesses.forEach(function(guess){
+							ClueUtil.applyGuessToHands(guess, allHands, solHand);
+						});
+
+						//process guesses
+						ClueUtil.processGuesses(allHands, solHand, guesses, gameCards.allCards);
+					});
+
+					it("identifying the full solution", function(){
+						expect(solHand.isFullSolutionKnown()).toBe(true);
+					});
+
+					it("identifying the correct person card", function(){
+						expect(solHand.person).toBe(solPerson);
+					});
+
+					it("identifying the correct weapon card", function(){
+						expect(solHand.weapon).toBe(solWeapon);
+					});
+
+					it("identifying the correct room card", function(){
+						expect(solHand.room).toBe(solRoom);
+					});
+
+					it("identifying all 3 cards are known in player1's hand, 0 are unknown", function(){
+						expect(player1.hand.countKnownCards()).toBe(3);
+						expect(player1.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the 3 cards in player1's hand", function(){
+						expect(player1.hand.hasCard(gameCards.personCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.weaponCards[1])).toBe(true);
+						expect(player1.hand.hasCard(gameCards.roomCards[1])).toBe(true);
+					});
+
+					it("identifying all 3 cards are known in player2's hand, 0 are unknown", function(){
+						expect(player2.hand.countKnownCards()).toBe(3);
+						expect(player2.hand.countUnknownCards()).toBe(0);
+					});
+
+					it("identifying the 3 cards in player2's hand", function(){
+						expect(player2.hand.hasCard(gameCards.personCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.weaponCards[2])).toBe(true);
+						expect(player2.hand.hasCard(gameCards.roomCards[2])).toBe(true);
+					});
+				});
+					
+			});
 		});
 
 		//test support functions
