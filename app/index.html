@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
   <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="game-setup/game-setup.css">
   <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
 <!-- custom JS loads (MUST be before AngularJS script tags) -->
   <script src="core/clue-logic/clue-classes.js"></script>
@@ -22,6 +23,8 @@
   -->
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
+  <!-- custom classes/libraries load -->
+  <script src="clue-logic/clue-classes.js"></script>
   <!-- Main app load -->
   <script src="app.module.js"></script>
   <!-- Custom services/core modules load -->
@@ -31,17 +34,21 @@
   <!-- Components load -->
   <script src="card-list/card-list.module.js"></script>
   <script src="card-list/card-list.component.js"></script>
+  <script src="game-setup/game-setup.module.js"></script>
+  <script src="game-setup/game-setup.component.js"></script>
+
 </head>
 <body>
   <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
 
+<game-setup></game-setup>
  
-
+<!--
   <card-list></card-list>
 
   <card-list></card-list>
-
+-->
 </body>
 </html>

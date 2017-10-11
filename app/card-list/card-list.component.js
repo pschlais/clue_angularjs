@@ -3,13 +3,13 @@
 angular.module('cardList')
 	.component('cardList', {
 		templateUrl: 'card-list/card-list.template.html',
-		controller: ['GameState', 
-			function CardListController(GameState) {
+		controller: ['gameState', 
+			function cardListController(gameState) {
 				var self = this;
 
-				self.data = GameState.data;
+				self.data = gameState.data;
 				self.changeName = function() {
-					GameState.changeFirstCard();
+					gameState.changeFirstCard();
 				};
 			}
 		]

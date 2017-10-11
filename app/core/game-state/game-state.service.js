@@ -3,16 +3,21 @@
 
 angular.
 	module('core.gameState').
-		factory('GameState', [ //put DI's here if applicable
+		factory('gameState', [ //put DI's here if applicable
 			function(){
+
+				let allCardNames = ClueUtil.allCardNames();
+				let cards = [new Card('Test', CardType.ROOM)]
 
 				return {
 					data: {
-						cards: [new Card('Test', CardType.ROOM)],
+						cardNameList: allCardNames,
 					},
-					//functions here
+					//service functions here
+					/*
 					changeFirstCard: function() {
 							this.data.cards[0].name = this.data.cards[0].name + "a";
 						}
+					*/
 				}; //return object
 		}]);

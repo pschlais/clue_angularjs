@@ -1,0 +1,14 @@
+.gsValid {
+	color: green;
+}
+
+.gsInvalid {
+	color: red;
+}
+
+.gsValidateIcon {
+	height: 1.3em;
+	width: 1.3em;
+	float: left;
+	margin: 0px 5px;
+}

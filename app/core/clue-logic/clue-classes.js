@@ -574,6 +574,35 @@ class Player {
 var ClueUtil = (function() {
 
 	//public functions
+	let allCardNames = function(){
+		//returns an array of strings containing the names of all cards.
+		return [
+			"Col. Mustard",
+			"Miss Scarlet",
+			"Mr. Green",
+			"Mrs. Peacock",
+			"Mrs. White",
+			"Prof. Plum",
+
+			"Candlestick",
+			"Knife",
+			"Lead Pipe",
+			"Revolver",
+			"Rope",
+			"Wrench",
+			
+			"Ballroom",
+			"Billiard Room",
+			"Conservatory",
+			"Dining Room",
+			"Hall",
+			"Kitchen",
+			"Library",
+			"Lounge",
+			"Study",
+			];
+	};
+
 	let applyGuessToHands = function(guess, hands, solution) {
 		//Applies the results of a guess to all applicable players. This includes
 		//the players who said "No" to the guess before a player showed a card.
@@ -1093,6 +1122,7 @@ var ClueUtil = (function() {
 	//module return object
 	return {
 		//module functions
+		allCardNames: allCardNames,
 		applyGuessToHands: applyGuessToHands,
 		generateAllClueCards: generateAllClueCards,
 		newKnownCardUpdate: newKnownCardUpdate,
