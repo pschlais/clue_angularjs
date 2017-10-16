@@ -4,5 +4,6 @@
 angular.module('clueApp', [
 	'core',
 	'cardList',
-	'gameSetup'
+	'gameSetup',
+	'playerStatus'
 ]);

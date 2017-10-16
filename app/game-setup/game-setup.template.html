@@ -30,6 +30,7 @@
 	<!-- Other players -->
 	<h2>Other players ({{$ctrl.otherPlayers.length}}) [max: 5]</h2>
 	<button ng-click="$ctrl.addOtherPlayer()" ng-disabled="$ctrl.otherPlayerCountAtMax()">Add Player</button>
+	<p>NOTE: player inputs must be in the order of play, starting from you.</p>
 	<table>
 		<tr>
 			<th>Name</th>
@@ -55,10 +56,10 @@
 		<img ng-src="{{$ctrl.validateCardCount() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
 		<p ng-class="{gsValid: $ctrl.validateCardCount(), gsInvalid: !$ctrl.validateCardCount()}">The total number of cards adds up to 18 (current: {{$ctrl.getCardCount()}})</p>
 	</div>
-	<button ng-disabled="!($ctrl.allInputsValidated())">Start Game!</button>
+	<button ng-disabled="!($ctrl.allInputsValidated())" ng-click="$ctrl.startGame()">Start Game!</button>
 	
 	
-
+<!--
 	<br>
 	<br>
 	<h2>Angular controller status</h2>
@@ -73,4 +74,5 @@
 		<pre>name: {{$ctrl.otherPlayers[$index].name}}</pre>
 		<pre>cardCount: {{$ctrl.otherPlayers[$index].cardCount}}</pre>
 	</span>
+-->
 </div>

@@ -1,0 +1,22 @@
+<h1>Player Status</h1>
+<pre>Hands: {{$ctrl.hands.length}}</pre>
+<pre>Solution: {{$ctrl.solution.length}}</pre>
+<pre>Cards: {{$ctrl.cards.length}}</pre>
+<div class="playerStatus" ng-repeat="hand in $ctrl.hands">
+	<h2>{{hand.name}} ({{hand.handSize}})</h2>
+	<ul>
+		<li ng-repeat="card in hand.knownCards">{{card.name}}</li>
+	</ul>
+	<h4>Card Status</h4>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Status</th>
+		</tr>
+		<tr ng-repeat="card in $ctrl.cards">
+			<td>{{card.name}}</td>
+			<!--<td>{{$ctrl.translateCardStatus(1)}}, {{hand.checkCardStatus(card)}}, {{card.parentHand.name}}</td>-->
+			<td>{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}</td>
+		</tr>
+	</table>
+</div>

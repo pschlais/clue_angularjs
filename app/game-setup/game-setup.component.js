@@ -169,6 +169,10 @@ angular.module('gameSetup')
 						   self.validatePlayersUnique();
 				}
 
+				self.startGame = function(){
+					gameState.setUpGame(self.mainPlayer, self.otherPlayers);
+				}
+
 			}
 		]
 	});
