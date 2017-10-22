@@ -173,6 +173,31 @@ angular.module('gameSetup')
 					gameState.setUpGame(self.mainPlayer, self.otherPlayers);
 				}
 
+				//------ FUNCTIONS FOR TESTING -------------//
+				self._quickSetup3Players = function(){
+					//sets up inputs for 3 players
+					self.mainPlayer.cards = ["Col. Mustard",
+											 "Mr. Green",
+											 "Revolver",
+											 "Lead Pipe",
+											 "Study",
+											 "Ballroom"];
+					self.otherPlayers = [{name: "Player1", cardCount: self.maxCards},
+									 {name: "Player2", cardCount: self.maxCards}];
+				}
+
+				self._quickSetup4Players = function(){
+					//sets up inputs for 3 players
+					self.mainPlayer.cards = ["Col. Mustard",
+											 "Mr. Green",
+											 "Revolver",
+											 "Lead Pipe",
+											 "Study"];
+					self.otherPlayers = [{name: "Player1", cardCount: 5},
+									 {name: "Player2", cardCount: 4},
+									 {name: "Player3", cardCount: 4}];
+				}
+
 			}
 		]
 	});

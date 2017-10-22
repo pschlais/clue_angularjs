@@ -1,0 +1,14 @@
+.geValid {
+	color: green;
+}
+
+.geInvalid {
+	color: red;
+}
+
+.geValidateIcon {
+	height: 1.3em;
+	width: 1.3em;
+	float: left;
+	margin: 0px 5px;
+}

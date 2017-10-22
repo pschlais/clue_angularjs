@@ -28,6 +28,42 @@ angular.module('playerStatus')
 					}
 				};
 
+				self.solutionDisplay = function(cardType){
+					//returns the string to display for the solution person.
+					//INPUTS:
+					//	-cardType: "person", "reapon", "room" only valid inputs
+					switch (cardType) {
+						case "person":
+							if (self.solution.isPersonKnown()) {
+								return self.solution.person.name;
+							} else {
+								return "Unknown";
+							}
+							break;
+
+						case "weapon":
+							if (self.solution.isWeaponKnown()) {
+								return self.solution.weapon.name;
+							} else {
+								return "Unknown";
+							}
+							break;
+
+						case "room":
+							if (self.solution.isRoomKnown()) {
+								return self.solution.room.name;
+							} else {
+								return "Unknown";
+							}
+							break;
+
+						default:
+							return "Unknown input: '" + cardType + "'";
+							break;
+					}
+					
+				}
+
 			}
 		]
 	});

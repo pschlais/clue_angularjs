@@ -1,4 +1,6 @@
 div.playerStatus {
-	float: left;
+	display: inline-block;
+	/*float: left;*/
+	vertical-align: top;
 	margin: 0px 30px;
 }

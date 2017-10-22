@@ -482,8 +482,8 @@ class Guess {
 	//	weapon: Card() object [REQUIRED]
 	//	card: Card() object [REQUIRED]
 	//	guessHand: Hand() object [REQUIRED]
-	//	showHand: Hand() object, or null if nobody showed a card [REQUIRED]
-	//	shownCard: Card() object or null [REQUIRED]. Used if the guessHand is the
+	//	showHand: Hand() object, or null if nobody showed a card [OPTIONAL]
+	//	shownCard: Card() object or null [OPTIONAL]. Used if the guessHand is the
 	//				main player and the showing player directly shows the main player
 	//				a card.
 	constructor(person, weapon, room, guessHand, showHand=null, shownCard=null) {

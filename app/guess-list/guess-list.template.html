@@ -1,0 +1,21 @@
+<div>
+	<h1>Guess List</h1>
+	<table class="glTable">
+		<tr>
+			<th>Person</th>
+			<th>Weapon</th>
+			<th>Room</th>
+			<th>Guess Player</th>
+			<th>Show Player</th>
+			<th>Shown Card</th>
+		</tr>
+		<tr ng-repeat="guess in $ctrl.guesses">
+			<td>{{$ctrl.translateCardName(guess.person)}}</td>
+			<td>{{$ctrl.translateCardName(guess.weapon)}}</td>
+			<td>{{$ctrl.translateCardName(guess.room)}}</td>
+			<td>{{$ctrl.translatePlayerName(guess.guessHand)}}</td>
+			<td>{{$ctrl.translatePlayerName(guess.showHand)}}</td>
+			<td>{{$ctrl.translateCardName(guess.shownCard)}}</td>
+		</tr>
+	</table>
+</div>

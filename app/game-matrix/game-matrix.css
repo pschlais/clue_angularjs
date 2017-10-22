@@ -1,0 +1,23 @@
+.gmTable tr, .gmTable td, .gmTable th {
+	border: 1px solid #000;
+}
+
+.gmConfirmedCard {
+	background-color: #e59109;
+}
+
+.gmEliminatedCard {
+	background-color: #a0a0a0;
+}
+
+.gmUnknownCard {
+	background-color: #fff;
+}
+
+.gmNotSolutionCard {
+	background-color: #a0a0a0;
+}
+
+.gmIsSolutionCard {
+	background-color: #62ff49;
+}

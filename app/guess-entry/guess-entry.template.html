@@ -1,0 +1,70 @@
+<h1>Enter a Guess</h1>
+<div>
+	<div>
+		Person:
+		<select ng-model="$ctrl.guessPerson">
+			<option value=""></option>
+			<option ng-repeat="pcard in $ctrl.personCardOptions" ng-value="pcard">{{pcard}}</option>
+		</select>
+	</div>
+	<div>
+		Weapon:
+		<select ng-model="$ctrl.guessWeapon">
+			<option value=""></option>
+			<option ng-repeat="wcard in $ctrl.weaponCardOptions" ng-value="wcard">{{wcard}}</option>
+		</select>
+	</div>
+	<div>
+		Room:
+		<select ng-model="$ctrl.guessRoom">
+			<option value=""></option>
+			<option ng-repeat="rcard in $ctrl.roomCardOptions" ng-value="rcard">{{rcard}}</option>
+		</select>
+	</div>
+	<div>
+		Player Making Guess:
+		<select ng-model="$ctrl.guessPlayer">
+			<option value=""></option>
+			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+		</select>
+	</div>
+	<div>
+		Player Showing a Card:
+		<select ng-model="$ctrl.showPlayer">
+			<option value=""></option>
+			<option ng-value="$ctrl.noShowPlayerOption">No one</option>
+			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+		</select>
+	</div>
+	<div ng-if="$ctrl.mainPlayerGuessAndShow()">
+		Card Shown to You:
+		<select ng-model="$ctrl.shownCard">
+			<option value=""></option>
+			<option ng-repeat="card in $ctrl.shownCardOptions()" ng-value="card">{{card}}</option>
+		</select>
+	</div>
+</div>
+
+<div>
+	<h4>Requirements:</h4>
+	<div>
+		<img ng-src="{{$ctrl.completeGuessCards() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+		<p ng-class="{geValid: $ctrl.completeGuessCards(), geInvalid: !$ctrl.completeGuessCards()}">All guess card fields are filled</p>
+	</div>
+	<div>
+		<img ng-src="{{$ctrl.completeGuessPlayers() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+		<p ng-class="{geValid: $ctrl.completeGuessPlayers(), geInvalid: !$ctrl.completeGuessPlayers()}">All player fields are filled</p>
+	</div>
+	<div>
+		<img ng-src="{{$ctrl.guessShowPlayersDifferent() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+		<p ng-class="{geValid: $ctrl.guessShowPlayersDifferent(), geInvalid: !$ctrl.guessShowPlayersDifferent()}">"Guess" and "Show" player fields are not the same</p>
+	</div>
+	<div ng-if="$ctrl.mainPlayerGuessAndShow()">
+		<img ng-src="{{$ctrl.completeShownCard() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+		<p ng-class="{geValid: $ctrl.completeShownCard(), geInvalid: !$ctrl.completeShownCard()}">The card shown field is filled</p>
+	</div>
+</div>
+
+<div>
+	<button ng-click="$ctrl.addGuess()" ng-disabled="!$ctrl.validateAllInputs()">Add Guess</button>
+</div>

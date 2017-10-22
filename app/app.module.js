@@ -5,5 +5,9 @@ angular.module('clueApp', [
 	'core',
 	'cardList',
 	'gameSetup',
-	'playerStatus'
+	'playerStatus',
+	'gameMatrix',
+	'guessEntry',
+	'guessList'
 ]);
+

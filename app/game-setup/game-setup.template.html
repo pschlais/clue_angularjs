@@ -4,6 +4,8 @@
 		<h2>Main Player (You)</h2>
 		Input your cards ({{$ctrl.mainPlayer.cards.length}}):
 		<button ng-click="$ctrl.addCard()" ng-disabled="$ctrl.mainPlayerCardsAtMax()">Add Card</button>
+		<button ng-click="$ctrl._quickSetup3Players()">TESTING: 3 players</button>
+		<button ng-click="$ctrl._quickSetup4Players()">TESTING: 4 players</button>
 		<!-- <input type="number" ng-model="$ctrl.mainPlayer.cardCount" min="1" max="6"> cards
 		<button ng-click="$ctrl.updateCardCount($ctrl.mainPlayer.cardCount)">Update Card Fields</button> -->
 		<ol>

@@ -1,0 +1,21 @@
+<div>
+	<table class="gmTable">
+		<tr>
+			<!-- Column for card name (header empty) -->
+			<th></th>
+			<!-- All players -->
+			<th ng-repeat="hand in $ctrl.hands">{{hand.name}}</th>
+			<!-- Solution -->
+			<th>Solution</th>
+		</tr>
+		<tr ng-repeat="card in $ctrl.cards">
+			<!-- Card name -->
+			<th ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card)}">{{card.name}}</th>
+			<!-- All players status for card-->
+			<th ng-repeat="hand in $ctrl.hands" ng-class="{gmConfirmedCard: $ctrl.confirmedCard(hand, card), gmEliminatedCard: $ctrl.eliminatedCard(hand, card), gmUnknownCard: $ctrl.unknownCard(hand, card)}">{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}</th>
+			<!-- Solution status for card-->
+			<th ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card)}">{{$ctrl.translateCardStatus($ctrl.solution.checkCardStatus(card))}}</th>
+		</tr>
+
+	</table>
+</div>

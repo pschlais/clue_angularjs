@@ -14,6 +14,9 @@
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="game-setup/game-setup.css">
   <link rel="stylesheet" href="player-status/player-status.css">
+  <link rel="stylesheet" href="game-matrix/game-matrix.css">
+  <link rel="stylesheet" href="guess-entry/guess-entry.css">
+  <link rel="stylesheet" href="guess-list/guess-list.css">
 
   <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
 <!-- custom JS loads (MUST be before AngularJS script tags) -->
@@ -33,6 +36,8 @@
   <script src="core/core.module.js"></script>
   <script src="core/game-state/game-state.module.js"></script>
   <script src="core/game-state/game-state.service.js"></script>
+  <!-- app controller load (must be after game-state)-->
+  <script src="app.controller.js"></script>
   <!-- Components load -->
   <script src="card-list/card-list.module.js"></script>
   <script src="card-list/card-list.component.js"></script>
@@ -40,15 +45,29 @@
   <script src="game-setup/game-setup.component.js"></script>
   <script src="player-status/player-status.module.js"></script>
   <script src="player-status/player-status.component.js"></script>
+  <script src="game-matrix/game-matrix.module.js"></script>
+  <script src="game-matrix/game-matrix.component.js"></script>
+  <script src="guess-entry/guess-entry.module.js"></script>
+  <script src="guess-entry/guess-entry.component.js"></script>
+  <script src="guess-list/guess-list.module.js"></script>
+  <script src="guess-list/guess-list.component.js"></script>
 
 </head>
-<body>
+<body ng-controller="ClueAppController">
   <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
 
-<game-setup></game-setup>
-<player-status></player-status>
+<div ng-if="!gameInitialized()">
+  <game-setup></game-setup>
+</div>
+<div ng-if="gameInitialized()">
+  <guess-entry></guess-entry>
+  <guess-list></guess-list>
+  <player-status></player-status>
+  <game-matrix></game-matrix>
+</div>
+
  
 <!--
   <card-list></card-list>
