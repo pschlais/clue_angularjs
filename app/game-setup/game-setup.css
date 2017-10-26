@@ -12,3 +12,32 @@
 	float: left;
 	margin: 0px 5px;
 }
+
+.gsSelect {
+	width: 70%;
+	margin-left: 10px;
+	margin-top: 3px;
+}
+
+.gsNameInput {
+	width: 100%;
+	margin-right: 10px;
+}
+
+.gsCardCountInput {
+	margin-right: 3px;
+	width: 50%;
+	display: inline;
+}
+
+.gsNameCell {
+	width: 50%;
+}
+
+#startGame {
+	margin-bottom: 30px;
+}
+
+.gsAddButton {
+	margin-bottom: 16px;
+}

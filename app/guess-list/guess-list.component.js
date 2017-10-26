@@ -9,6 +9,20 @@ angular.module('guessList')
 
 				//gameState references
 				self.guesses = gameState.data.guesses;
+				self.hands = gameState.data.hands;
+				//guess options (strings)
+				self.personCardOptions = gameState.getCardNamesByType("person");
+				self.weaponCardOptions = gameState.getCardNamesByType("weapon");
+				self.roomCardOptions = gameState.getCardNamesByType("room");
+
+				//properties
+				self.guessFilter = {
+					person: "!!",
+					weapon: "!!",
+					room: "!!",
+					guessHand: "!!",
+					showHand: "!!",
+				};
 
 				//functions
 				self.translatePlayerName = function(hand) {
