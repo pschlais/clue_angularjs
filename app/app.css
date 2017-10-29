@@ -23,3 +23,38 @@
   content: "|";
   padding-right: 0.3em;
 }
+
+.jumbotron {
+	background-image: url("/img/inspector.jpg");
+	background-color: #EDEDED;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+
+#title {
+	text-shadow: 2px 2px 2px #fff;
+}
+
+#subtitle {
+	text-shadow: 1px 1px 2px #fff;
+}
+
+#topNavbar {
+  background-color: #78b9ff;
+}
+
+#topNavbarList {
+  flex-direction: row;
+}
+
+#topNavbarList a {
+  width: 100%;
+  padding: 0px 25px;
+}
+
+#topNavbar img {
+  width: auto;
+  height: 20px;
+}

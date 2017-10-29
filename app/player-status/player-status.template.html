@@ -1,33 +1,40 @@
-<h1>Player Status</h1>
-<!--
-<pre>Hands: {{$ctrl.hands.length}}</pre>
-<pre>Solution: {{$ctrl.solution.length}}</pre>
-<pre>Cards: {{$ctrl.cards.length}}</pre> 
--->
-<div layout="column">
-	<div class="playerStatus" ng-repeat="hand in $ctrl.hands">
-		<h2>{{hand.name}} ({{hand.countKnownCards()}}/{{hand.handSize}})</h2>
-		<ul>
-			<li ng-repeat="card in hand.knownCards">{{card.name}}</li>
-		</ul>
-		<!--
-		<h4>Card Status</h4>
-		<table>
-			<tr>
-				<th>Name</th>
-				<th>Status</th>
-			</tr>
-			<tr ng-repeat="card in $ctrl.cards">
-				<td>{{card.name}}</td>
-				<td>{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}</td>
-			</tr>
-		</table>
-		-->
-	</div>
-	<div class="playerStatus">
-		<h2>Solution ({{$ctrl.solution.countKnownCards()}}/{{$ctrl.solution.handSize}})</h2>
-		<p>Person: {{$ctrl.solutionDisplay("person")}}</p>
-		<p>Weapon: {{$ctrl.solutionDisplay("weapon")}}</p>
-		<p>Room: {{$ctrl.solutionDisplay("room")}}</p>
+<div id="#playerStatus">
+	<h1>Player Hands</h1>
+	<!--
+	<pre>Hands: {{$ctrl.hands.length}}</pre>
+	<pre>Solution: {{$ctrl.solution.length}}</pre>
+	<pre>Cards: {{$ctrl.cards.length}}</pre> 
+	-->
+	<div id="accordion" role="tablist">
+		<!-- players -->
+		<div class="card" ng-repeat="hand in $ctrl.hands">
+			<div class="card-header" role="tab" ng-attr-id="{{'playerHeading' + $index}}">
+				<h2 class="mb-0">
+					<a class="collapsed" data-toggle="collapse" ng-href="{{'#playerStatus' + $index}}">{{hand.name}} ({{hand.countKnownCards()}}/{{hand.handSize}})</a>
+				</h2>
+			</div>
+			<div ng-attr-id="{{'playerStatus' + $index}}" class="collapse" role="tabpanel" data-parent="#accordion">
+				<div class="card-body">
+					<ul>
+						<li ng-repeat="card in hand.knownCards">{{card.name}}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- solution -->
+		<div class="card">
+			<div class="card-header" role="tab" id="solutionHeading">
+				<h2 class="mb-0">
+					<a data-toggle="collapse" href="#solutionStatus">Solution ({{$ctrl.solution.countKnownCards()}}/{{$ctrl.solution.handSize}})</a>
+				</h2>
+			</div>
+			<div id="solutionStatus" class="collapse show" role="tabpanel" data-parent="#accordion">
+				<div class="card-body">
+					<p>Person: {{$ctrl.solutionDisplay("person")}}</p>
+					<p>Weapon: {{$ctrl.solutionDisplay("weapon")}}</p>
+					<p>Room: {{$ctrl.solutionDisplay("room")}}</p>
+				</div>	
+			</div>
+		</div>
 	</div>
 </div>

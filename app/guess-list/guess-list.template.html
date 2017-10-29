@@ -4,14 +4,14 @@
 	<div ng-if="$ctrl.guesses.length === 0">
 		No guesses have been made.
 	</div>
-	<table class="glTable" ng-if="$ctrl.guesses.length > 0">
+	<table class="table table-striped" ng-if="$ctrl.guesses.length > 0">
 		<tr>
-			<th>Person</th>
-			<th>Weapon</th>
-			<th>Room</th>
-			<th>Guess Player</th>
-			<th>Show Player</th>
-			<th>Shown Card</th>
+			<th scope="col">Person</th>
+			<th scope="col">Weapon</th>
+			<th scope="col">Room</th>
+			<th scope="col">Guess Player</th>
+			<th scope="col">Show Player</th>
+			<th scope="col">Shown Card</th>
 		</tr>
 		<tr ng-repeat="guess in $ctrl.guesses">
 			<td>{{$ctrl.translateCardName(guess.person)}}</td>

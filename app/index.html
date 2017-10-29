@@ -60,15 +60,57 @@
   <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
+  
+  <div ng-if="!gameInitialized()">
+    <div class="jumbotron">
+      <h2 id="title" class="display-3">Clue Solver</h2>
+      <p id="subtitle" class="lead">Let us focus on solving the clues, so you can focus on your poker face.</p>
+    </div>
+  </div>
 
-<div ng-if="!gameInitialized()">
-  <game-setup></game-setup>
-</div>
-<div ng-if="gameInitialized()">
-  <guess-entry></guess-entry>
-  <guess-list></guess-list>
-  <player-status></player-status>
-  <game-matrix></game-matrix>
+  <div ng-if="gameInitialized()">
+    <!-- Navbar -->
+    <nav id="topNavbar" class="navbar sticky-top navbar-default">
+      <ul id="topNavbarList" class="nav navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#" ng-click="changePage(page.ADDGUESS)"><img src="img/icons/plus.svg"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" ng-click="changePage(page.GUESSES)"><img src="img/icons/list-unordered.svg"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" ng-click="changePage(page.HANDS)"><img src="img/icons/organization.svg"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" ng-click="changePage(page.MATRIX)"><img src="img/icons/table-grid.svg"></a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+<div class="container-fluid">
+  <div ng-if="!gameInitialized()">
+    <game-setup></game-setup>
+  </div>
+  <div ng-if="gameInitialized()">
+    <!-- pages -->
+    <div ng-if="currentPage === page.ADDGUESS">
+      <guess-entry></guess-entry>
+    </div>
+    
+    <div ng-if="currentPage === page.GUESSES">
+      <guess-list></guess-list>
+    </div>
+    
+    <div ng-if="currentPage === page.HANDS">
+      <player-status></player-status>
+    </div>
+    
+    <div ng-if="currentPage === page.MATRIX">
+      <game-matrix></game-matrix>
+    </div>
+    
+  </div>
 </div>
 
 <!-- Bootstrap JS loads -->

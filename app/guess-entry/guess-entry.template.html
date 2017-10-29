@@ -1,49 +1,55 @@
 <h1>Enter a Guess</h1>
-<div>
-	<div>
-		Person:
-		<select ng-model="$ctrl.guessPerson">
+<form id="guessEntryForm">
+	<div class="form-group row">
+		<label for="guessPerson" class="col-4 col-form-label">Person:</label>
+		<select id="guessPerson" class="col-6 custom-select" ng-model="$ctrl.guessPerson">
 			<option value=""></option>
 			<option ng-repeat="pcard in $ctrl.personCardOptions" ng-value="pcard">{{pcard}}</option>
 		</select>
+		<div class="col-2"></div>
 	</div>
-	<div>
-		Weapon:
-		<select ng-model="$ctrl.guessWeapon">
+	<div class="form-group row">
+		<label for="guessWeapon" class="col-4 col-form-label">Weapon:</label>
+		<select id="guessWeapon" class="col-6 custom-select" ng-model="$ctrl.guessWeapon">
 			<option value=""></option>
 			<option ng-repeat="wcard in $ctrl.weaponCardOptions" ng-value="wcard">{{wcard}}</option>
 		</select>
+		<div class="col-2"></div>
 	</div>
-	<div>
-		Room:
-		<select ng-model="$ctrl.guessRoom">
+	<div class="form-group row">
+		<label for="guessRoom" class="col-4 col-form-label">Room:</label>
+		<select id="guessRoom" class="col-6 custom-select" ng-model="$ctrl.guessRoom">
 			<option value=""></option>
 			<option ng-repeat="rcard in $ctrl.roomCardOptions" ng-value="rcard">{{rcard}}</option>
 		</select>
+		<div class="col-2"></div>
 	</div>
-	<div>
-		Player Making Guess:
-		<select ng-model="$ctrl.guessPlayer">
+	<div class="form-group row">
+		<label for="guessPlayer" class="col-4 col-form-label">Player Guessing:</label>
+		<select id="guessPlayer" class="col-6 custom-select" ng-model="$ctrl.guessPlayer">
 			<option value=""></option>
 			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+			<div class="col-2"></div>
 		</select>
 	</div>
-	<div>
-		Player Showing a Card:
-		<select ng-model="$ctrl.showPlayer">
+	<div class="form-group row">
+		<label for="showPlayer" class="col-4 col-form-label">Player Showing:</label>
+		<select id="showPlayer" class="col-6 custom-select" ng-model="$ctrl.showPlayer">
 			<option value=""></option>
 			<option ng-value="$ctrl.noShowPlayerOption">No one</option>
 			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
 		</select>
+		<div class="col-2"></div>
 	</div>
-	<div ng-if="$ctrl.mainPlayerGuessAndShow()">
-		Card Shown to You:
-		<select ng-model="$ctrl.shownCard">
+	<div class="form-group row" ng-if="$ctrl.mainPlayerGuessAndShow()">
+		<label for="shownCard" class="col-4 col-form-label">Card Shown:</label>
+		<select id="shownCard" class="col-6 custom-select" ng-model="$ctrl.shownCard">
 			<option value=""></option>
 			<option ng-repeat="card in $ctrl.shownCardOptions()" ng-value="card">{{card}}</option>
 		</select>
+		<div class="col-2"></div>
 	</div>
-</div>
+</form>
 
 <div>
 	<h4>Requirements:</h4>
@@ -66,5 +72,5 @@
 </div>
 
 <div>
-	<button ng-click="$ctrl.addGuess()" ng-disabled="!$ctrl.validateAllInputs()">Add Guess</button>
+	<button class="btn btn-primary btn-block" ng-click="$ctrl.addGuess()" ng-disabled="!$ctrl.validateAllInputs()">Add Guess</button>
 </div>

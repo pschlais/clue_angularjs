@@ -1,21 +1,112 @@
-<div>
-	<table class="gmTable">
-		<tr>
-			<!-- Column for card name (header empty) -->
-			<th></th>
-			<!-- All players -->
-			<th ng-repeat="hand in $ctrl.hands">{{hand.name}}</th>
-			<!-- Solution -->
-			<th>Solution</th>
-		</tr>
-		<tr ng-repeat="card in $ctrl.cards">
-			<!-- Card name -->
-			<th ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card)}">{{card.name}}</th>
-			<!-- All players status for card-->
-			<th ng-repeat="hand in $ctrl.hands" ng-class="{gmConfirmedCard: $ctrl.confirmedCard(hand, card), gmEliminatedCard: $ctrl.eliminatedCard(hand, card), gmUnknownCard: $ctrl.unknownCard(hand, card)}">{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}</th>
-			<!-- Solution status for card-->
-			<th ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card)}">{{$ctrl.translateCardStatus($ctrl.solution.checkCardStatus(card))}}</th>
-		</tr>
+<div id="gmBody">
+	<h1>Card List</h1>
 
+	<div id="gmLegendCollapse" role="tablist">
+		<div class="card">
+		
+		<div class="card-header" role="tab" id="gmLegendHeader">
+			<h2 class="mb-0">
+				<a data-toggle="collapse" class="collapsed" href="#gmLegendsCardBody">Color Legend</a>
+			</h2>
+		</div>
+
+		<div id="gmLegendsCardBody" class="collapse" role="tabpanel" data-parent="#gmLegendCollapse">
+			<div class="card-body">
+				<div class="row" id="gmLegends">
+					<div class="col-sm-4" id="gmPlayerLegend">
+						<div class="card">
+							<h4 class="card-header">Players</h4>
+							<div class="card-body">
+								<div ng-repeat="hand in $ctrl.hands" ng-class="'gmLegendEntry playerHeader' + $index">
+									<span class="card-text">{{hand.name}}</span>
+								</div>	
+							</div>	
+						</div>
+					</div>
+
+					<div class="col-sm-4" id="gmHandLegend">
+						<div class="card">
+							<h4 class="card-header">Player Hands</h4>
+							<div class="card-body">
+								<div class="gmLegendEntry gmConfirmedCard">
+									<span>Has card</span>
+								</div>
+								<div class="gmLegendEntry gmEliminatedCard">
+									<span>Doesn't have card</span>
+								</div>
+								<div class="gmLegendEntry gmUnknownCard">
+									<span>Could have card</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-sm-4" id="gmCardLegend">
+						<div class="card">
+							<h4 class="card-header">Card Names</h4>
+							<div class="card-body">
+								<div class="gmLegendEntry gmIsSolutionCard">
+									<span>Solution</span>
+								</div>
+								<div class="gmLegendEntry gmNotSolutionCard">
+									<span>Not solution</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>	
+	</div>
+	
+
+	<table id="gmTable" class="table table-sm">
+		<thead>
+			<tr>
+				<!-- Column for card name (header empty) -->
+				<th id="gmTopLeft"></th>
+				<!-- All players -->
+				<th scope="col" ng-repeat="hand in $ctrl.hands" ng-class="'playerHeader playerHeader' + $index">
+					<!--<div>{{hand.name}}</div>-->
+					{{hand.name[0].toUpperCase()}}
+				</th>
+				<!-- Solution
+				<th class="rotate-90"><div>Solution</div></th>
+				 -->
+			</tr>
+		</thead>
+		<tbody>
+			<!-- Person Cards -->
+			<tr ng-repeat="card in $ctrl.personCards()">
+				<!-- Card name -->
+				<td scope="row" class="cardLabel" ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card), gmLastCardInGroup: card.name ==='Prof. Plum'}">{{card.name}}</td>
+				<!-- All players status for card-->
+				<td class="statusCell" ng-repeat="hand in $ctrl.hands" ng-class="{gmConfirmedCard: $ctrl.confirmedCard(hand, card), gmEliminatedCard: $ctrl.eliminatedCard(hand, card), gmUnknownCard: $ctrl.unknownCard(hand, card), gmLastCardInGroup: card.name ==='Prof. Plum'}">
+					{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}
+				</td>
+			</tr>
+
+			<!-- Weapon Cards -->
+			<tr ng-repeat="card in $ctrl.weaponCards()">
+				<!-- Card name -->
+				<td scope="row" class="cardLabel" ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card), gmLastCardInGroup: card.name ==='Knife'}">{{card.name}}</td>
+				<!-- All players status for card-->
+				<td class="statusCell" ng-repeat="hand in $ctrl.hands" ng-class="{gmConfirmedCard: $ctrl.confirmedCard(hand, card), gmEliminatedCard: $ctrl.eliminatedCard(hand, card), gmUnknownCard: $ctrl.unknownCard(hand, card), gmLastCardInGroup: card.name ==='Knife'}">
+					{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}
+				</td>
+			</tr>
+
+			<!-- Room Cards -->
+			<tr ng-repeat="card in $ctrl.roomCards()">
+				<!-- Card name -->
+				<td scope="row" class="cardLabel" ng-class="{gmNotSolutionCard: $ctrl.notSolutionCard(card), gmIsSolutionCard: $ctrl.solution.hasCard(card)}">{{card.name}}</td>
+				<!-- All players status for card-->
+				<td class="statusCell" ng-repeat="hand in $ctrl.hands" ng-class="{gmConfirmedCard: $ctrl.confirmedCard(hand, card), gmEliminatedCard: $ctrl.eliminatedCard(hand, card), gmUnknownCard: $ctrl.unknownCard(hand, card)}">
+					{{$ctrl.translateCardStatus(hand.checkCardStatus(card))}}
+				</td>
+			</tr>
+		</tbody>
 	</table>
 </div>

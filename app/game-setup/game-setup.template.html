@@ -1,95 +1,71 @@
-<div class="jumbotron">
-	<h2 class="display-3">Clue Solver</h2>
-	<p class="lead">Let us focus on solving the clues, so you can focus on your poker face.</p>
-</div>
-
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-6">
-			<h2>Main Player (You)</h2>
-			<p>Input your cards ({{$ctrl.mainPlayer.cards.length}}):</p>
-			<button class="btn btn-primary gsAddButton" ng-click="$ctrl.addCard()" ng-disabled="$ctrl.mainPlayerCardsAtMax()">Add Another Card</button>
-			<button ng-click="$ctrl._quickSetup3Players()">TESTING: 3 players</button>
-			<button ng-click="$ctrl._quickSetup4Players()">TESTING: 4 players</button>
-			<!-- <input type="number" ng-model="$ctrl.mainPlayer.cardCount" min="1" max="6"> cards
-			<button ng-click="$ctrl.updateCardCount($ctrl.mainPlayer.cardCount)">Update Card Fields</button> -->
-			<ol>
-				<li ng-repeat="card in $ctrl.mainPlayer.cards track by $index">
-					<select class="custom-select gsSelect" ng-model="$ctrl.mainPlayer.cards[$index]">
-						<option value=""></option>
-						<option ng-repeat="option in $ctrl.allCards" ng-value="option">{{option}}</option>
-					</select>
-					<button ng-if="$index >= $ctrl.minCards" class="btn" ng-click="$ctrl.removeCard($index)"><img src="img/icons/trashcan.svg"></button>
-					<!--<button ng-if="$index >= $ctrl.minCards" ng-click="$ctrl.removeCard($index)">Remove Card</button>-->
-				</li>
-			</ol>
-			<!-- Input validators -->
-			<p>Requirements:</p>
-			<div>
-				<img ng-src="{{$ctrl.validateCardsFilled() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
-				<p ng-class="{gsValid: $ctrl.validateCardsFilled(), gsInvalid: !$ctrl.validateCardsFilled()}">All card fields are filled</p>
-			</div>
-			<div>
-				<img ng-src="{{$ctrl.validateCardsUnique() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
-				<p ng-class="{gsValid: $ctrl.validateCardsUnique(), gsInvalid: !$ctrl.validateCardsUnique()}">All card fields are unique</p>
-			</div>
-		</div>
-
-		<div class="col-md-6">
-			<!-- Other players -->
-			<h2>Other players ({{$ctrl.otherPlayers.length}}) [max: 5]</h2>
-			<p>NOTE: player inputs must be in the order of play, starting from you.</p>
-			<button class="btn btn-primary gsAddButton" ng-click="$ctrl.addOtherPlayer()" ng-disabled="$ctrl.otherPlayerCountAtMax()">Add Player</button>
-			<table class="table table-small">
-				<tr>
-					<th class="gsNameCell">Name</th>
-					<th>Cards</th>
-				</tr>
-				<tr ng-repeat="player in $ctrl.otherPlayers track by $index">
-					<td class="gsNameCell"><input type="text" class="form-control gsNameInput" ng-model="$ctrl.otherPlayers[$index].name"></td>
-					<td>
-						<input type="number" class="form-control gsCardCountInput" ng-model="$ctrl.otherPlayers[$index].cardCount" min="{{$ctrl.minCards}}" max="{{$ctrl.maxCards}}">
-						<button ng-if="$index >= $ctrl.minOtherPlayers" class="btn" ng-click="$ctrl.removePlayer($index)"><img src="img/icons/trashcan.svg"></button>
-					</td>
-				</tr>
-			</table>
-
-			<!-- Input validators -->
-			<p>Requirements:</p>
-			<div>
-				<img ng-src="{{$ctrl.validatePlayersFilled() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
-				<p ng-class="{gsValid: $ctrl.validatePlayersFilled(), gsInvalid: !$ctrl.validatePlayersFilled()}">All player name fields are filled</p>
-			</div>
-			<div>
-				<img ng-src="{{$ctrl.validatePlayersUnique() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
-				<p ng-class="{gsValid: $ctrl.validatePlayersUnique(), gsInvalid: !$ctrl.validatePlayersUnique()}">All player names are unique</p>
-			</div>
-			<div>
-				<img ng-src="{{$ctrl.validateCardCount() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
-				<p ng-class="{gsValid: $ctrl.validateCardCount(), gsInvalid: !$ctrl.validateCardCount()}">The total number of cards adds up to 18 (current: {{$ctrl.getCardCount()}})</p>
-			</div>
-		</div>
+<div class="row">
+	<div class="col-md-6">
+		<h2>Main Player (You)</h2>
+		<p>Input your cards ({{$ctrl.mainPlayer.cards.length}}):</p>
+		<button class="btn btn-primary gsAddButton" ng-click="$ctrl.addCard()" ng-disabled="$ctrl.mainPlayerCardsAtMax()">Add Another Card</button>
 		
+		<!-- TEST BUTTONS FOR CONVENIENCE
+		<button ng-click="$ctrl._quickSetup3Players()">TESTING: 3 players</button>
+		<button ng-click="$ctrl._quickSetup4Players()">TESTING: 4 players</button>
+		-->
+		<ol>
+			<li ng-repeat="card in $ctrl.mainPlayer.cards track by $index">
+				<select class="custom-select gsSelect" ng-model="$ctrl.mainPlayer.cards[$index]">
+					<option value=""></option>
+					<option ng-repeat="option in $ctrl.allCards" ng-value="option">{{option}}</option>
+				</select>
+				<button ng-if="$index >= $ctrl.minCards" class="btn" ng-click="$ctrl.removeCard($index)"><img src="img/icons/trashcan.svg"></button>
+				<!--<button ng-if="$index >= $ctrl.minCards" ng-click="$ctrl.removeCard($index)">Remove Card</button>-->
+			</li>
+		</ol>
+		<!-- Input validators -->
+		<p>Requirements:</p>
+		<div>
+			<img ng-src="{{$ctrl.validateCardsFilled() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
+			<p ng-class="{gsValid: $ctrl.validateCardsFilled(), gsInvalid: !$ctrl.validateCardsFilled()}">All card fields are filled</p>
+		</div>
+		<div>
+			<img ng-src="{{$ctrl.validateCardsUnique() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
+			<p ng-class="{gsValid: $ctrl.validateCardsUnique(), gsInvalid: !$ctrl.validateCardsUnique()}">All card fields are unique</p>
+		</div>
+	</div>
 
-	</div> <!-- end of row -->
+	<div class="col-md-6">
+		<!-- Other players -->
+		<h2>Other players ({{$ctrl.otherPlayers.length}}) [max: 5]</h2>
+		<p>NOTE: player inputs must be in the order of play, starting from you.</p>
+		<button class="btn btn-primary gsAddButton" ng-click="$ctrl.addOtherPlayer()" ng-disabled="$ctrl.otherPlayerCountAtMax()">Add Player</button>
+		<table class="table table-sm">
+			<tr>
+				<th class="gsNameCell">Name</th>
+				<th>Cards</th>
+			</tr>
+			<tr ng-repeat="player in $ctrl.otherPlayers track by $index">
+				<td class="gsNameCell"><input type="text" class="form-control gsNameInput" ng-model="$ctrl.otherPlayers[$index].name"></td>
+				<td>
+					<input type="number" class="form-control gsCardCountInput" ng-model="$ctrl.otherPlayers[$index].cardCount" min="{{$ctrl.minCards}}" max="{{$ctrl.maxCards}}">
+					<button ng-if="$index >= $ctrl.minOtherPlayers" class="btn" ng-click="$ctrl.removePlayer($index)"><img src="img/icons/trashcan.svg"></button>
+				</td>
+			</tr>
+		</table>
+
+		<!-- Input validators -->
+		<p>Requirements:</p>
+		<div>
+			<img ng-src="{{$ctrl.validatePlayersFilled() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
+			<p ng-class="{gsValid: $ctrl.validatePlayersFilled(), gsInvalid: !$ctrl.validatePlayersFilled()}">All player name fields are filled</p>
+		</div>
+		<div>
+			<img ng-src="{{$ctrl.validatePlayersUnique() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
+			<p ng-class="{gsValid: $ctrl.validatePlayersUnique(), gsInvalid: !$ctrl.validatePlayersUnique()}">All player names are unique</p>
+		</div>
+		<div>
+			<img ng-src="{{$ctrl.validateCardCount() && 'img/checkmark.png' || 'img/redx.png'}}" class="gsValidateIcon">
+			<p ng-class="{gsValid: $ctrl.validateCardCount(), gsInvalid: !$ctrl.validateCardCount()}">The total number of cards adds up to 18 (current: {{$ctrl.getCardCount()}})</p>
+		</div>
+	</div>
 	
-	<button id="startGame" class="btn btn-primary btn-lg btn-block" ng-disabled="!($ctrl.allInputsValidated())" ng-click="$ctrl.startGame()">Start Game!</button>
-	
-	
-<!--
-	<br>
-	<br>
-	<h2>Angular controller status</h2>
-	<p>$ctrl.mainPlayer</p>
-	<pre>name: {{$ctrl.mainPlayer.name}}</pre>
-	<pre>cardCount: {{$ctrl.mainPlayer.cardCount}}</pre>
-	<pre>cards: {{$ctrl.mainPlayer.cards}}</pre>
-	<br>
-	<p>$ctrl.otherPlayers</p>
-	<span ng-repeat="player in $ctrl.otherPlayers track by $index">
-		<h5>Player {{$index+1}}</h5>
-		<pre>name: {{$ctrl.otherPlayers[$index].name}}</pre>
-		<pre>cardCount: {{$ctrl.otherPlayers[$index].cardCount}}</pre>
-	</span>
--->
-</div>
+
+</div> <!-- end of row -->
+
+<button id="startGame" class="btn btn-primary btn-lg btn-block" ng-disabled="!($ctrl.allInputsValidated())" ng-click="$ctrl.startGame()">Start Game!</button>

@@ -45,6 +45,42 @@ angular.module('gameMatrix')
 					return self.solution.checkCardStatus(card) === CardHeld.NO;
 				}
 
+				self.personCards = function() {
+					//returns list of person cards
+					let plist = [];
+					self.cards.forEach(function(card) {
+						if (card.cardType === CardType.PERSON) {
+							plist.push(card);
+						}
+					});
+
+					return plist;
+				}
+
+				self.weaponCards = function() {
+					//returns list of weapon cards
+					let wlist = [];
+					self.cards.forEach(function(card) {
+						if (card.cardType === CardType.WEAPON) {
+							wlist.push(card);
+						}
+					});
+
+					return wlist;
+				}
+
+				self.roomCards = function() {
+					//returns list of room cards
+					let rlist = [];
+					self.cards.forEach(function(card) {
+						if (card.cardType === CardType.ROOM) {
+							rlist.push(card);
+						}
+					});
+
+					return rlist;
+				}
+
 			}
 		]
 	});

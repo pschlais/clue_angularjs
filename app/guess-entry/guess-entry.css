@@ -12,3 +12,16 @@
 	float: left;
 	margin: 0px 5px;
 }
+
+#guessEntryForm div {
+	margin-bottom: 5px;
+}
+
+#guessEntryForm * select {
+	margin: auto 0px;
+}
+/*
+#guessPerson, #guessWeapon, #guessRoom, #guessPlayer, #showPlayer, #shownCard {
+	margin: auto 0px;
+}
+*/
