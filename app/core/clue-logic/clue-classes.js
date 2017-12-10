@@ -567,6 +567,8 @@ class Player {
 		//if this point is reached, no supplied card is in heldCards
 		return null;
 	}
+
+
 }
 
 //-------------- IIFE MODULES ------------------------
@@ -1013,9 +1015,11 @@ var ClueUtil = (function() {
 		return i_loop;
 	};
 
-	// ----- TO BE IMPLEMENTED: -------------------------------
-
 	//private functions
+	let _getRandomArrayItem = function(x) {
+		//For array x[], returns an item at a random index.
+		return x[Math.floor(Math.random() * x.length)];
+	};
 
 	//test functions
 	let _generateTestCards = function(pcards, wcards, rcards) {
@@ -1118,6 +1122,41 @@ var ClueUtil = (function() {
 		return guessObj;
 	};
 
+	let _generateRandomGuess = function(allPlayers, allCards) {
+		/* Generates a guess from a random player for a random set of cards.
+		INPUTS:
+			-allPlayers: [Player()]
+			-allCards: [Card()]
+		OUTPUT:
+			Guess()
+		*/
+		//get random player
+		let randomPlayer = _getRandomArrayItem(allPlayers);
+		//separate cards by type
+		let people = [];
+		let weapons = [];
+		let rooms = [];
+
+		allCards.forEach(function(card) {
+			if(card.cardType === CardType.PERSON) {
+				people.push(card);
+			} else if (card.cardType === CardType.WEAPON) {
+				weapons.push(card);
+			} else {
+				rooms.push(card);
+			}
+		});
+
+		//get random cards
+		randomPerson = _getRandomArrayItem(people);
+		randomWeapon = _getRandomArrayItem(weapons);
+		randomRoom = _getRandomArrayItem(rooms);
+
+		//simulate guess and return
+		return _simulateGuess(randomPlayer, randomPerson, randomWeapon, randomRoom, allPlayers);
+	};
+
+
 
 	//module return object
 	return {
@@ -1132,7 +1171,8 @@ var ClueUtil = (function() {
 
 		//test functions
 		_generateTestCards: _generateTestCards,
-		_simulateGuess: _simulateGuess
+		_simulateGuess: _simulateGuess,
+		_generateRandomGuess: _generateRandomGuess,
 
 	}; //end return object
 }()); //end ClueUtil
