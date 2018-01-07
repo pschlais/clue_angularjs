@@ -12,6 +12,12 @@ const CardHeld = {
 	UNKNOWN: 3
 };
 
+const BadGuessCode = {
+	PASS_PLAYER_HAS_CARD: 1,
+	NO_POSSIBLE_CARDS_IN_HAND: 2,
+	PLAYER_CANT_SHOW_THAT_CARD: 3
+};
+
 
 //------------ CLASSES -----------------------------------
 
@@ -1015,6 +1021,85 @@ var ClueUtil = (function() {
 		return i_loop;
 	};
 
+	let verifyValidGuess = function(guess, allHands, solution) {
+		/* Verifies that a current guess is valid given the current state of the game.
+			If not, information is returned regarding the components of the guess that
+			are invalid.
+
+			INPUTS:
+				guess: Guess() to be verified
+				allHands: [Hand()] in the order of play
+				solution: Solution()
+			OUTPUT:
+				{
+				 validGuess: bool,
+				 invalidComponents: [
+				 	{
+				 	 code: BadGuessCode (enum), (PASS_PLAYER_HAS_CARD,
+				 	 							 NO_POSSIBLE_CARDS_IN_HAND,
+				 	 							 PLAYER_CANT_SHOW_THAT_CARD)
+					 cards: [Card()]
+				 	}]
+				 }
+		*/
+
+		//initialize return object as a valid guess
+		let returnObj = {validGuess: true, invalidComponents: []};
+
+		//---- determine list of players to loop through (guess --> show) ----
+		let i_guessHand = allHands.indexOf(guess.guessHand);
+		let i_showHand;
+		if (guess.showHand === null) {
+			//no player shows, so set index of "showing" player to guessing player for looping purposes
+			i_showHand = i_guessHand;
+		} else {
+			i_showHand = allHands.indexOf(guess.showHand);
+		}
+
+		//get list of players that said "no" (i.e. players between guess and show, non-inclusive)
+		if (i_guessHand >= i_showHand) {
+			//shift index to second repetition of player order [a,b,c][a,b,c]
+			//e.g. if "b" guesses and "a" shows, i_guessHand = 1, i_showHand = 3
+			i_showHand += allHands.length;
+		}
+
+		let passHands = allHands.concat(allHands).slice(i_guessHand + 1, i_showHand);
+
+		//---- (1) check if all cards in the guess are known not to be in the show-er's hand
+		let sh = guess.showHand;
+		if (sh.checkCardStatus(guess.person) === CardHeld.NO &&
+			sh.checkCardStatus(guess.weapon) === CardHeld.NO &&
+			sh.checkCardStatus(guess.room) === CardHeld.NO) {
+			//invalid guess since player said to show a card is known not to have any of the cards
+			returnObj.validGuess = false;
+			returnObj.invalidComponents.push({code: BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND,
+											  cards: [guess.person, guess.weapon, guess.room]});
+		}
+		
+		//---- (2) check if each of the guess cards are covered by a player that said "no" ----
+		[guess.person, guess.weapon, guess.room].forEach(function(guessCard) {
+			if (guessCard.isHolderKnown() && passHands.indexOf(guessCard.parentHand) !== -1) {
+				//guessCard is in the hand of a player who said "no"; invalid guess.
+				returnObj.validGuess = false;
+				returnObj.invalidComponents.push({code: BadGuessCode.PASS_PLAYER_HAS_CARD,
+												  cards: [guessCard]});
+			}
+		});
+
+		//---- (3) if it is a main player guess, check that the shown card can actually be in that player's hand
+		if (guess.shownCard !== null) {
+			if(guess.shownCard.isHolderKnown() && guess.shownCard.parentHand !== guess.showHand) {
+				//card is known to be in a hand that isn't the show-er, so it must be invalid
+				returnObj.validGuess = false;
+				returnObj.invalidComponents.push({code: BadGuessCode.PLAYER_CANT_SHOW_THAT_CARD,
+												  cards: [guess.shownCard]});
+			}
+		}
+
+		//return results
+		return returnObj;
+	}
+
 	//private functions
 	let _getRandomArrayItem = function(x) {
 		//For array x[], returns an item at a random index.
@@ -1168,6 +1253,7 @@ var ClueUtil = (function() {
 		deduceCardSingleGuess: deduceCardSingleGuess,
 		deduceCardByNos: deduceCardByNos,
 		processGuesses: processGuesses,
+		verifyValidGuess: verifyValidGuess,
 
 		//test functions
 		_generateTestCards: _generateTestCards,

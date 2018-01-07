@@ -46,7 +46,6 @@ describe('Class', function(){
 				expect(card.isHolderKnown()).toBe(false);
 			});
 		});
-
 	});
 
 	describe('Hand', function() {
@@ -570,7 +569,6 @@ describe('Class', function(){
 			});
 
 		}); 
-
 	});
 
 	describe('Solution', function() {
@@ -1006,7 +1004,6 @@ describe('Class', function(){
 			});
 
 		});
-
 	});
 
 	describe("Player", function() {
@@ -1820,7 +1817,6 @@ describe('IIFE Module', function() {
 			});
 		});
 
-		//TODO: write unit tests for processGuesses
 		describe("method 'processGuesses'", function(){
 			//block variables
 			let player0, player1, player2, allPlayers;
@@ -2259,6 +2255,439 @@ describe('IIFE Module', function() {
 					});
 				});
 					
+			});
+		});
+
+		describe("method 'verifyValidGuess'", function() {
+			//block variables
+			let player0, player1, player2, allPlayers;
+			let gameCards;
+			let allHands, solHand;
+			let solPerson, solWeapon, solRoom;
+			let player0cards, player1cards, player2cards, solutioncards;
+
+			beforeEach(function(){
+				/*set up game state:
+					-3 players
+					-3 cards per player: 1/1/1 person/weapon/room each, index same as player number
+					-player0 is main player
+					-solution is last card of each type in list (index 3)
+				*/
+				//generate cards
+				gameCards = ClueUtil._generateTestCards(4,4,4);
+
+				//generate players
+				player0cards = [gameCards.personCards[0],
+									gameCards.weaponCards[0],
+									gameCards.roomCards[0]];
+				player0 = new Player("Player0", gameCards.allCards, true, false, player0cards);
+
+				player1cards = [gameCards.personCards[1],
+									gameCards.weaponCards[1],
+									gameCards.roomCards[1]];
+				player1 = new Player("Player1", gameCards.allCards, false, false, player1cards);
+
+				player2cards = [gameCards.personCards[2],
+									gameCards.weaponCards[2],
+									gameCards.roomCards[2]];
+				player2 = new Player("Player2", gameCards.allCards, false, false, player2cards);
+
+				allPlayers = [player0, player1, player2];
+
+				//generate solution
+				solPerson = gameCards.personCards[3];
+				solWeapon = gameCards.weaponCards[3];
+				solRoom = gameCards.roomCards[3];
+				solutioncards = [solPerson, solWeapon, solRoom];
+				playerSol = new Player("Solution", gameCards.allCards, false, true, solutioncards);
+				
+				//store hands of players
+				allHands = [player0.hand, player1.hand, player2.hand];
+				solHand = playerSol.hand;
+
+				//apply main player known cards to other players
+				ClueUtil.newKnownCardUpdate(allHands, solHand, player0.heldCards);
+
+				//assume player1 weapon card and player2 room card has already been discovered
+				let guess1 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+						gameCards.weaponCards[1], gameCards.roomCards[0], allPlayers);
+				let guess2 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+						gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers);
+
+				ClueUtil.applyGuessToHands(guess1, allHands, solHand);
+				ClueUtil.applyGuessToHands(guess2, allHands, solHand);
+				ClueUtil.processGuesses(allHands, solHand, [guess1, guess2], gameCards.allCards);
+
+			});
+
+			describe("for a valid guess", function() {
+
+				describe("by the main player", function() {
+					//block variables
+					let mainPlayerGuess;
+					let personCard, weaponCard, roomCard;
+					let verifyGuessObj;	
+					
+					beforeEach(function() {
+						//main player guess
+						let mainPlayerGuess = ClueUtil._simulateGuess(player0, gameCards.personCards[0],
+								gameCards.weaponCards[2], gameCards.roomCards[0], allPlayers);
+
+						//validate the guess
+						verifyGuessObj = ClueUtil.verifyValidGuess(mainPlayerGuess, allHands, solHand);
+					});
+
+					it("flags the guess as valid", function() {
+						expect(verifyGuessObj.validGuess).toBe(true);
+					});
+
+					it("does not return any 'invalid components'", function() {
+						expect(verifyGuessObj.invalidComponents.length).toBe(0);
+					});
+
+				});
+
+				describe("by another player", function() {
+					//block variables
+					let otherPlayerGuess;
+					let personCard, weaponCard, roomCard;
+					let verifyGuessObj;	
+
+					beforeEach(function() {
+						//player 2 guess, player 1 shows
+						otherPlayerGuess = ClueUtil._simulateGuess(player2, gameCards.personCards[2],
+								gameCards.weaponCards[2], gameCards.roomCards[1], allPlayers);
+
+						//validate the guess
+						verifyGuessObj = ClueUtil.verifyValidGuess(otherPlayerGuess, allHands, solHand);
+					});
+
+					it("flags the guess as valid", function() {
+						expect(verifyGuessObj.validGuess).toBe(true);
+					});
+
+					it("does not return any 'invalid components'", function() {
+						expect(verifyGuessObj.invalidComponents.length).toBe(0);
+					});
+
+				});
+
+			});
+
+			describe("for a known invalid guess", function() {
+				
+				describe("by the main player", function() {
+
+					describe("where a 'pass' player is known to have a card", function() {
+						//block variables
+						let personCard, weaponCard, roomCard;
+						let invalidGuess;
+						let verifyGuessObj;
+
+						beforeEach(function() {
+							//set invalid guess: guess weapon in player1's hand, but say player2 shows
+							personCard = gameCards.personCards[0];
+							weaponCard = gameCards.weaponCards[1];
+							roomCard = gameCards.roomCards[2];
+							invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+												player0.hand, player2.hand);
+							//validate the guess
+							verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+						});
+						
+						it("flags the guess as invalid", function() {
+							expect(verifyGuessObj.validGuess).toBe(false);
+						});
+
+						it("returns the correct invalid guess codes", function() {
+							//1 problem with guess
+							expect(verifyGuessObj.invalidComponents.length).toBe(1);
+							//problem is that a "pass" player has one of the cards in the guess
+							expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.PASS_PLAYER_HAS_CARD);
+						});
+
+						it("returns the correct invalid components of the guess", function() {
+							let comp = verifyGuessObj.invalidComponents[0];
+							//1 card
+							expect(comp.cards.length).toBe(1);
+							//weapon in player1's hand
+							expect(comp.cards[0]).toBe(weaponCard);
+						});
+					});
+
+					describe("where the 'show' player does not have any cards", function() {
+
+						describe("and they are all held by other players", function() {
+							//block variables
+							let personCard, weaponCard, roomCard;
+							let invalidGuess;
+							let verifyGuessObj;
+
+							beforeEach(function() {
+								//add 2 more guesses to round out player2's hand: person and weapon
+								let guess1 = ClueUtil._simulateGuess(player0, gameCards.personCards[2], 
+										gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers);
+								let guess2 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+										gameCards.weaponCards[2], gameCards.roomCards[0], allPlayers);
+
+								ClueUtil.applyGuessToHands(guess1, allHands, solHand);
+								ClueUtil.applyGuessToHands(guess2, allHands, solHand);
+								ClueUtil.processGuesses(allHands, solHand, [guess1, guess2], gameCards.allCards);
+
+								//set invalid guess: main player guess, player1 shows, but all cards are in player2 hand
+								personCard = gameCards.personCards[2];
+								weaponCard = gameCards.weaponCards[2];
+								roomCard = gameCards.roomCards[2];
+								invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+													player0.hand, player1.hand);
+								//validate the guess
+								verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+							});
+
+							it("flags the guess as invalid", function(){
+								expect(verifyGuessObj.validGuess).toBe(false);
+							});
+
+							it("returns the correct invalid guess codes", function() {
+								//1 problem with guess
+								expect(verifyGuessObj.invalidComponents.length).toBe(1);
+								//problem is that a "pass" player has one of the cards in the guess
+								expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND);
+							});
+
+							it("returns the correct invalid components of the guess", function() {
+								let comp = verifyGuessObj.invalidComponents[0];
+								//3 cards
+								expect(comp.cards.length).toBe(3);
+								//all cards should be in the returned invalidComponent array
+								expect(comp.cards.indexOf(personCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(weaponCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(roomCard)).toBeGreaterThan(-1);
+							});
+						});
+
+						describe("and they are all held by the main player", function() {
+
+							//block variables
+							let personCard, weaponCard, roomCard;
+							let invalidGuess;
+							let verifyGuessObj;
+
+							beforeEach(function() {
+								//set invalid guess: main player guess, player1 shows, but all cards are in player0 hand
+								personCard = gameCards.personCards[0];
+								weaponCard = gameCards.weaponCards[0];
+								roomCard = gameCards.roomCards[0];
+								invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+													player0.hand, player1.hand);
+								//validate the guess
+								verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+							});
+
+							it("flags the guess as invalid", function(){
+								expect(verifyGuessObj.validGuess).toBe(false);
+							});
+
+							it("returns the correct invalid guess codes", function() {
+								//1 problem with guess
+								expect(verifyGuessObj.invalidComponents.length).toBe(1);
+								//problem is that a "pass" player has one of the cards in the guess
+								expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND);
+							});
+
+							it("returns the correct invalid components of the guess", function() {
+								let comp = verifyGuessObj.invalidComponents[0];
+								//3 cards
+								expect(comp.cards.length).toBe(3);
+								//all cards should be in the returned invalidComponent array
+								expect(comp.cards.indexOf(personCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(weaponCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(roomCard)).toBeGreaterThan(-1);
+							});
+						});
+					});
+
+					describe("where the shown card is known not to be in the showing player's hand", function() {
+						//block variables
+						let personCard, weaponCard, roomCard;
+						let invalidGuess;
+						let verifyGuessObj;
+
+						beforeEach(function() {
+							//set invalid guess: guess weapon in player1's hand, but say person is shown (known in main hand)
+							personCard = gameCards.personCards[0];
+							weaponCard = gameCards.weaponCards[1];
+							roomCard = gameCards.roomCards[2];
+							invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+												player0.hand, player1.hand, personCard);
+							//validate the guess
+							verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+						});
+						
+						it("flags the guess as invalid", function(){
+							expect(verifyGuessObj.validGuess).toBe(false);
+						});
+
+						it("returns the correct invalid guess codes", function() {
+							//1 problem with guess
+							expect(verifyGuessObj.invalidComponents.length).toBe(1);
+							//problem code is correct
+							expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.PLAYER_CANT_SHOW_THAT_CARD);
+						});
+
+						it("returns the correct invalid components of the guess", function() {
+							let comp = verifyGuessObj.invalidComponents[0];
+							//1 card
+							expect(comp.cards.length).toBe(1);
+							//all cards should be in the returned invalidComponent array
+							expect(comp.cards[0]).toBe(personCard);
+						});
+					});
+				});
+
+				describe("by another player", function() {
+
+					describe("where a 'pass' player is known to have a card", function() {
+						//block variables
+						let personCard, weaponCard, roomCard;
+						let invalidGuess;
+						let verifyGuessObj;
+
+						beforeEach(function() {
+							//set invalid guess: player2 guess, main player does not show the person card,
+							// says player1 shows
+							personCard = gameCards.personCards[0];
+							weaponCard = gameCards.weaponCards[1];
+							roomCard = gameCards.roomCards[2];
+							invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+												player2.hand, player1.hand);
+							//validate the guess
+							verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+						});
+
+						it("flags the guess as invalid", function() {
+							expect(verifyGuessObj.validGuess).toBe(false);
+						});
+
+						it("returns the correct invalid guess codes", function() {
+							//1 problem with guess
+							expect(verifyGuessObj.invalidComponents.length).toBe(1);
+							//problem is that a "pass" player has one of the cards in the guess
+							expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.PASS_PLAYER_HAS_CARD);
+						});
+
+						it("returns the correct invalid components of the guess", function() {
+							let comp = verifyGuessObj.invalidComponents[0];
+							//1 card
+							expect(comp.cards.length).toBe(1);
+							//weapon in player1's hand
+							expect(comp.cards[0]).toBe(personCard);
+						});
+					});
+
+					describe("where the 'show' player does not have any cards", function() {
+
+						describe("and they are all held by another player", function() {
+							//block variables
+							let personCard, weaponCard, roomCard;
+							let invalidGuess;
+							let verifyGuessObj;
+
+							beforeEach(function() {
+								//add 2 more guesses to round out player1's hand: person and room
+								let guess1 = ClueUtil._simulateGuess(player0, gameCards.personCards[1], 
+										gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers);
+								let guess2 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+										gameCards.weaponCards[0], gameCards.roomCards[1], allPlayers);
+
+								ClueUtil.applyGuessToHands(guess1, allHands, solHand);
+								ClueUtil.applyGuessToHands(guess2, allHands, solHand);
+								ClueUtil.processGuesses(allHands, solHand, [guess1, guess2], gameCards.allCards);
+
+								//set invalid guess: player1 guess all cards in own hand, says player2 shows
+								personCard = gameCards.personCards[1];
+								weaponCard = gameCards.weaponCards[1];
+								roomCard = gameCards.roomCards[1];
+								invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+													player1.hand, player2.hand);
+								//validate the guess
+								verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+							});
+
+							it("flags the guess as invalid", function(){
+								expect(verifyGuessObj.validGuess).toBe(false);
+							});
+
+							it("returns the correct invalid guess codes", function() {
+								//1 problem with guess
+								expect(verifyGuessObj.invalidComponents.length).toBe(1);
+								//problem is that a "pass" player has one of the cards in the guess
+								expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND);
+							});
+
+							it("returns the correct invalid components of the guess", function() {
+								let comp = verifyGuessObj.invalidComponents[0];
+								//3 cards
+								expect(comp.cards.length).toBe(3);
+								//weapon in player1's hand
+								expect(comp.cards.indexOf(personCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(weaponCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(roomCard)).toBeGreaterThan(-1);
+							});
+						});
+
+						describe("and they are all held by the main player", function() {
+							//block variables
+							let personCard, weaponCard, roomCard;
+							let invalidGuess;
+							let verifyGuessObj;
+
+							beforeEach(function() {
+								//add 2 more guesses to round out player1's hand: person and room
+								let guess1 = ClueUtil._simulateGuess(player0, gameCards.personCards[1], 
+										gameCards.weaponCards[0], gameCards.roomCards[0], allPlayers);
+								let guess2 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+										gameCards.weaponCards[0], gameCards.roomCards[1], allPlayers);
+
+								ClueUtil.applyGuessToHands(guess1, allHands, solHand);
+								ClueUtil.applyGuessToHands(guess2, allHands, solHand);
+								ClueUtil.processGuesses(allHands, solHand, [guess1, guess2], gameCards.allCards);
+
+								//set invalid guess: player1 guess all cards in main player hand, says player2 shows
+								personCard = gameCards.personCards[0];
+								weaponCard = gameCards.weaponCards[0];
+								roomCard = gameCards.roomCards[0];
+								invalidGuess = new Guess(personCard, weaponCard, roomCard, 
+													player1.hand, player2.hand);
+								//validate the guess
+								verifyGuessObj = ClueUtil.verifyValidGuess(invalidGuess, allHands, solHand);
+							});
+
+							it("flags the guess as invalid", function(){
+								expect(verifyGuessObj.validGuess).toBe(false);
+							});
+
+							it("returns the correct invalid guess codes", function() {
+								//1 problem with guess
+								expect(verifyGuessObj.invalidComponents.length).toBe(1);
+								//problem is that a "pass" player has one of the cards in the guess
+								expect(verifyGuessObj.invalidComponents[0].code).toBe(BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND);
+							});
+
+							it("returns the correct invalid components of the guess", function() {
+								let comp = verifyGuessObj.invalidComponents[0];
+								//3 cards
+								expect(comp.cards.length).toBe(3);
+								//weapon in player1's hand
+								expect(comp.cards.indexOf(personCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(weaponCard)).toBeGreaterThan(-1);
+								expect(comp.cards.indexOf(roomCard)).toBeGreaterThan(-1);
+							});
+						});
+					});
+				});
+
+				
 			});
 		});
 
