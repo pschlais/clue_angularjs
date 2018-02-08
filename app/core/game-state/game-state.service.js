@@ -13,7 +13,7 @@ angular.
 				let solution = new Solution(cards);
 				let flags = {gameInitialized: false};
 
-				//private functions
+				//------ private functions------------------------------------------
 				let _findCardObject = function(name) {
 					//finds Card() based on name property
 					let foundCard = null;
@@ -57,12 +57,10 @@ angular.
 					}	
 				};
 
-				//public functions
-				let addGuess = function(pcard, wcard, rcard, guessPlayer,
-				showPlayer, shownCard, noShowPlayerOption) {
-					/*Parses the guess inputs into "Clue" objects, then applies that
-					  guess to determine if new cards can be deduced based on the
-					  new information.
+				let _translateToGuessObject = function(pcard, wcard, rcard, guessPlayer,
+					showPlayer, shownCard, noShowPlayerOption) {
+					/*Parses the guess inputs into "Clue" objects, then compiles them into
+						a Guess() object that is returned.
 
 					INPUTS:
 						pcard: 			string, name of person card
@@ -74,8 +72,10 @@ angular.
 												player guesses)
 						noShowPlayerOption: string, value to signify no player showed
 													a card for this guess
-					*/
 
+					OUTPUT:
+						Guess() object
+					*/
 					//correlate input strings to objects
 					let personCard = _findCardObject(pcard);
 					let weaponCard = _findCardObject(wcard);
@@ -98,8 +98,34 @@ angular.
 					}
 
 					//create the guess object
-					let guess = new Guess(personCard, weaponCard, roomCard,
+					return new Guess(personCard, weaponCard, roomCard,
 										guessHand, showHand, shownCardObj);
+
+
+				}
+
+				//------ public functions ----------------------------------------
+				let addGuess = function(pcard, wcard, rcard, guessPlayer,
+				showPlayer, shownCard, noShowPlayerOption) {
+					/*Parses the guess inputs into "Clue" objects, then applies that
+					  guess to determine if new cards can be deduced based on the
+					  new information.
+
+					INPUTS:
+						pcard: 			string, name of person card
+						wcard: 			string, name of weapon card
+						rcard: 			string, name of room card
+						guessPlayer: 	string, name of guessing player
+						showPlayer:     string, name of showing player
+						shownCard:  	string, name of shown card (only used if main
+												player guesses)
+						noShowPlayerOption: string, value to signify no player showed
+													a card for this guess
+					*/
+
+					//create Guess() object
+					let guess = _translateToGuessObject(pcard, wcard, rcard, guessPlayer,
+						showPlayer, shownCard, noShowPlayerOption);
 					
 					//add object to the list of guesses
 					guesses.push(guess);
@@ -174,6 +200,34 @@ angular.
 					return cardNames;
 				};
 
+				let verifyGuessIsValid = function(pcard, wcard, rcard, guessPlayer,
+				showPlayer, shownCard, noShowPlayerOption) {
+					/*Parses the guess inputs into "Clue" objects, then verifies that the
+						guess is logically valid based on the current game state
+
+					INPUTS:
+						pcard: 			string, name of person card
+						wcard: 			string, name of weapon card
+						rcard: 			string, name of room card
+						guessPlayer: 	string, name of guessing player
+						showPlayer:     string, name of showing player
+						shownCard:  	string, name of shown card (only used if main
+												player guesses)
+						noShowPlayerOption: string, value to signify no player showed
+													a card for this guess
+					*/
+
+					//create Guess() object
+					let guess = _translateToGuessObject(pcard, wcard, rcard, guessPlayer,
+						showPlayer, shownCard, noShowPlayerOption);
+					
+					//check valility of guess
+					let verifyObj = ClueUtil.verifyValidGuess(guess, hands, solution);
+
+					//translate any warnings to English strings and return as array
+					return ClueUtil.generateGuessWarnings(verifyObj);
+				};
+
 
 				//return factory object
 				return {
@@ -191,6 +245,7 @@ angular.
 					addGuess: addGuess,
 					setUpGame: setUpGame,
 					getCardNamesByType: getCardNamesByType,
+					verifyGuessIsValid: verifyGuessIsValid,
 
 				}; 
 			}

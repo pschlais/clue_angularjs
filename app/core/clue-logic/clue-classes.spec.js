@@ -2691,6 +2691,165 @@ describe('IIFE Module', function() {
 			});
 		});
 
+		describe("method 'generateGuessWarnings'", function() {
+			//block variables
+			let player0, player1, player2, allPlayers;
+			let gameCards;
+			let allHands, solHand;
+			let solPerson, solWeapon, solRoom;
+			let player0cards, player1cards, player2cards, solutioncards;
+
+			beforeEach(function(){
+				/*set up game state:
+					-3 players
+					-3 cards per player: 1/1/1 person/weapon/room each, index same as player number
+					-player0 is main player
+					-solution is last card of each type in list (index 3)
+				*/
+				//generate cards
+				gameCards = ClueUtil._generateTestCards(4,4,4);
+
+				//generate players
+				player0cards = [gameCards.personCards[0],
+									gameCards.weaponCards[0],
+									gameCards.roomCards[0]];
+				player0 = new Player("Player0", gameCards.allCards, true, false, player0cards);
+
+				player1cards = [gameCards.personCards[1],
+									gameCards.weaponCards[1],
+									gameCards.roomCards[1]];
+				player1 = new Player("Player1", gameCards.allCards, false, false, player1cards);
+
+				player2cards = [gameCards.personCards[2],
+									gameCards.weaponCards[2],
+									gameCards.roomCards[2]];
+				player2 = new Player("Player2", gameCards.allCards, false, false, player2cards);
+
+				allPlayers = [player0, player1, player2];
+
+				//generate solution
+				solPerson = gameCards.personCards[3];
+				solWeapon = gameCards.weaponCards[3];
+				solRoom = gameCards.roomCards[3];
+				solutioncards = [solPerson, solWeapon, solRoom];
+				playerSol = new Player("Solution", gameCards.allCards, false, true, solutioncards);
+				
+				//store hands of players
+				allHands = [player0.hand, player1.hand, player2.hand];
+				solHand = playerSol.hand;
+
+				//apply main player known cards to other players
+				ClueUtil.newKnownCardUpdate(allHands, solHand, player0.heldCards);
+
+				//assume player1 weapon card and player2 room card has already been discovered
+				let guess1 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+						gameCards.weaponCards[1], gameCards.roomCards[0], allPlayers);
+				let guess2 = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+						gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers);
+
+				ClueUtil.applyGuessToHands(guess1, allHands, solHand);
+				ClueUtil.applyGuessToHands(guess2, allHands, solHand);
+				ClueUtil.processGuesses(allHands, solHand, [guess1, guess2], gameCards.allCards);
+
+			});
+
+
+			describe("generates no warnings when the guess is valid by", function() {
+				//block variables
+				let mainPlayerGuess;
+				let verifyGuessObject;
+				let warningStrings;
+
+				beforeEach(function() {
+					//main player guess- person[0] & weapon[0] (in hand), room[2] shown by player2
+					mainPlayerGuess = ClueUtil._simulateGuess(player0, gameCards.personCards[0], 
+						gameCards.weaponCards[0], gameCards.roomCards[2], allPlayers);
+
+					//verify guess
+					verifyGuessObject = ClueUtil.verifyValidGuess(mainPlayerGuess, allHands, solHand);
+					//translate warnings (none in this case)
+					warningStrings = ClueUtil.generateGuessWarnings(verifyGuessObject);
+				});
+
+				it("returning an empty array", function() {
+					expect(warningStrings.length).toBe(0);
+				});
+			});
+
+			describe("generates the correct number of warnings when", function() {
+
+				describe("a 'pass' player has a card by", function() {
+					//block variables
+					let mainPlayerGuess;
+					let verifyGuessObject;
+					let warningStrings;
+
+					beforeEach(function() {
+						//main player guess- person[2] (unknown), weapon[1] (player1), room[0] (player0)
+						//--invalid component: guess says player2 showed (player1 has weapon)
+						mainPlayerGuess = new Guess(gameCards.personCards[2], gameCards.weaponCards[1], 
+							gameCards.roomCards[0], player0.hand, player2.hand);
+
+						//verify guess
+						verifyGuessObject = ClueUtil.verifyValidGuess(mainPlayerGuess, allHands, solHand);
+						//translate warnings (none in this case)
+						warningStrings = ClueUtil.generateGuessWarnings(verifyGuessObject);
+					});
+
+					it("returning an array with 1 string", function(){
+						expect(warningStrings.length).toBe(1);
+					});
+				});
+
+				describe("all guess cards are known not to be in the showing players hand by", function() {
+					//block variables
+					let mainPlayerGuess;
+					let verifyGuessObject;
+					let warningStrings;
+
+					beforeEach(function() {
+						//main player guess- person[0], weapon[0], room[2]
+						//--invalid component: guess says player1 showed (player1 doesn't have any of these cards)
+						mainPlayerGuess = new Guess(gameCards.personCards[0], gameCards.weaponCards[0], 
+							gameCards.roomCards[2], player0.hand, player1.hand);
+
+						//verify guess
+						verifyGuessObject = ClueUtil.verifyValidGuess(mainPlayerGuess, allHands, solHand);
+						//translate warnings (none in this case)
+						warningStrings = ClueUtil.generateGuessWarnings(verifyGuessObject);
+					});
+
+					it("returning an array with 3 strings", function(){
+						expect(warningStrings.length).toBe(3);
+					});
+				});
+
+				describe("the card shown during a main-player guess isn't possible by" ,function() {
+					//block variables
+					let mainPlayerGuess;
+					let verifyGuessObject;
+					let warningStrings;
+
+					beforeEach(function() {
+						//main player guess- person[0] (unknown), weapon[1] (player1), room[2] (player0)
+						//--invalid component: guess says player1 showed room[2] (held by player2)
+						mainPlayerGuess = new Guess(gameCards.personCards[0], gameCards.weaponCards[1], 
+							gameCards.roomCards[2], player0.hand, player1.hand, gameCards.roomCards[2]);
+
+						//verify guess
+						verifyGuessObject = ClueUtil.verifyValidGuess(mainPlayerGuess, allHands, solHand);
+						//translate warnings (none in this case)
+						warningStrings = ClueUtil.generateGuessWarnings(verifyGuessObject);
+					});
+
+					it("returning an array with 1 string", function() {
+						expect(warningStrings.length).toBe(1);
+					});
+				});
+
+			});
+		});
+
 		//test support functions
 		describe("method '_simulateGuess'", function(){
 			//block variables

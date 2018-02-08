@@ -51,23 +51,44 @@
 	</div>
 </form>
 
-<div>
-	<h4>Requirements:</h4>
-	<div>
-		<img ng-src="{{$ctrl.completeGuessCards() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-		<p ng-class="{geValid: $ctrl.completeGuessCards(), geInvalid: !$ctrl.completeGuessCards()}">All guess card fields are filled</p>
+<div class="row">
+	<div class="col-md-6">
+		<h4>Basic Guess Requirements:</h4>
+		<div>
+			<img ng-src="{{$ctrl.completeGuessCards() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+			<p ng-class="{geValid: $ctrl.completeGuessCards(), geInvalid: !$ctrl.completeGuessCards()}">All guess card fields are filled</p>
+		</div>
+		<div>
+			<img ng-src="{{$ctrl.completeGuessPlayers() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+			<p ng-class="{geValid: $ctrl.completeGuessPlayers(), geInvalid: !$ctrl.completeGuessPlayers()}">All player fields are filled</p>
+		</div>
+		<div>
+			<img ng-src="{{$ctrl.guessShowPlayersDifferent() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+			<p ng-class="{geValid: $ctrl.guessShowPlayersDifferent(), geInvalid: !$ctrl.guessShowPlayersDifferent()}">"Guess" and "Show" player fields are not the same</p>
+		</div>
+		<div ng-show="$ctrl.mainPlayerGuessAndShow()">
+			<img ng-src="{{$ctrl.completeShownCard() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+			<p ng-class="{geValid: $ctrl.completeShownCard(), geInvalid: !$ctrl.completeShownCard()}">The card shown field is filled</p>
+		</div>
 	</div>
-	<div>
-		<img ng-src="{{$ctrl.completeGuessPlayers() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-		<p ng-class="{geValid: $ctrl.completeGuessPlayers(), geInvalid: !$ctrl.completeGuessPlayers()}">All player fields are filled</p>
-	</div>
-	<div>
-		<img ng-src="{{$ctrl.guessShowPlayersDifferent() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-		<p ng-class="{geValid: $ctrl.guessShowPlayersDifferent(), geInvalid: !$ctrl.guessShowPlayersDifferent()}">"Guess" and "Show" player fields are not the same</p>
-	</div>
-	<div ng-if="$ctrl.mainPlayerGuessAndShow()">
-		<img ng-src="{{$ctrl.completeShownCard() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-		<p ng-class="{geValid: $ctrl.completeShownCard(), geInvalid: !$ctrl.completeShownCard()}">The card shown field is filled</p>
+
+	<div class="col-md-6">
+		<h4>Guess Validity Check:</h4>
+		<div ng-if="!$ctrl.basicRequirementsMet()">
+			<p class="geInvalid">Basic guess requirements must be met before checking guess validity</p>
+		</div>
+		<div ng-if="$ctrl.basicRequirementsMet()">
+			<div ng-if="$ctrl.verifyGuessIsValid().length === 0">
+				<img src="img/checkmark.png" class="geValidateIcon">
+				<p class="geValid">Guess is valid</p>
+			</div>
+			<div ng-if="$ctrl.verifyGuessIsValid().length > 0">
+				<div ng-repeat="warn in $ctrl.verifyGuessIsValid()">
+					<img src="img/redx.png" class="geValidateIcon">
+					<p class="geInvalid">{{warn}}</p>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 

@@ -511,7 +511,7 @@ class Player {
 	ATTRIBUTES:
 		name: string
 		heldCards: [Card()]
-		hand: Hand()
+		hand: Hand() (or Solution() for simulated solution)
 		isMainPlayer: boolean (default=false)
 		isSolution: boolean (default=false)
 	CONSTRUCTOR INPUTS:
@@ -1100,6 +1100,54 @@ var ClueUtil = (function() {
 		return returnObj;
 	}
 
+	let generateGuessWarnings = function(guessValidityObject) {
+		/* Takes the object returned from the ClueUtil.verifyValidGuess() function and
+			turns it into an array of strings explaining the problem(s) with the guess
+			in English.
+
+			INPUTS:
+				guessValidityObject: return object from ClueUtil.verifyValidGuess()
+			OUTPUT:
+				[String], one string for each "problem" card. Returns [] if valid guess is provided.
+		*/
+
+		let gvo = guessValidityObject;
+
+		if (gvo.validGuess === true) {
+			return [];
+		} else { //invalid guess. generate strings and return translations
+			let problemStrings = [];
+
+			gvo.invalidComponents.forEach(function(ic) {
+				if (ic.code === BadGuessCode.PASS_PLAYER_HAS_CARD) {
+					//print the card that would have needed to be shown and the player holding it
+					problemStrings.push(ic.cards[0].name + " is known to be in " + 
+						ic.cards[0].parentHand.name + "'s hand, so they would have had to show " +
+						"this card for this guess");
+
+				} else if (ic.code === BadGuessCode.NO_POSSIBLE_CARDS_IN_HAND) {
+					//loop over all invalid cards and print who (if known) holds them
+					ic.cards.forEach(function(card) {
+						let baseString = "";
+						baseString += "Showing player is known to not have '" + card.name + "'"
+						//if the card holder is known, print that as well
+						if (card.parentHand !== null) {
+							baseString += " (Held by " + card.parentHand.name + ")";
+						}
+						//append to return array
+						problemStrings.push(baseString);
+					});
+				} else if (ic.code === BadGuessCode.PLAYER_CANT_SHOW_THAT_CARD) {
+					//print that the card is known to be held by someone else
+					problemStrings.push(ic.cards[0].name +" can't be shown by this player because it " +
+						"is known to be held by " + ic.cards[0].parentHand.name);
+				}
+			});
+
+			return problemStrings;
+		}
+	}
+
 	//private functions
 	let _getRandomArrayItem = function(x) {
 		//For array x[], returns an item at a random index.
@@ -1249,6 +1297,7 @@ var ClueUtil = (function() {
 		allCardNames: allCardNames,
 		applyGuessToHands: applyGuessToHands,
 		generateAllClueCards: generateAllClueCards,
+		generateGuessWarnings: generateGuessWarnings,
 		newKnownCardUpdate: newKnownCardUpdate,
 		deduceCardSingleGuess: deduceCardSingleGuess,
 		deduceCardByNos: deduceCardByNos,
