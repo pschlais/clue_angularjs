@@ -6,6 +6,10 @@
 	color: red;
 }
 
+.geGuessBtn {
+	margin: 5px auto;
+}
+
 .geValidateIcon {
 	height: 1.3em;
 	width: 1.3em;

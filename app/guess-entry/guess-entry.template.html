@@ -1,97 +1,155 @@
 <h1>Enter a Guess</h1>
-<form id="guessEntryForm">
-	<div class="form-group row">
-		<label for="guessPerson" class="col-4 col-form-label">Person:</label>
-		<select id="guessPerson" class="col-6 custom-select" ng-model="$ctrl.guessPerson">
-			<option value=""></option>
-			<option ng-repeat="pcard in $ctrl.personCardOptions" ng-value="pcard">{{pcard}}</option>
-		</select>
-		<div class="col-2"></div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.GUESSING_PLAYER">
+	<h3>Which player made a guess?</h3>
+	<div ng-repeat="hand in $ctrl.hands">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessPlayer = hand.name; $ctrl.incrementView()">{{hand.name}}</button>
 	</div>
-	<div class="form-group row">
-		<label for="guessWeapon" class="col-4 col-form-label">Weapon:</label>
-		<select id="guessWeapon" class="col-6 custom-select" ng-model="$ctrl.guessWeapon">
-			<option value=""></option>
-			<option ng-repeat="wcard in $ctrl.weaponCardOptions" ng-value="wcard">{{wcard}}</option>
-		</select>
-		<div class="col-2"></div>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SHOWING_PLAYER">
+	<h3>Which player showed a card?</h3>
+	<div ng-repeat="hand in $ctrl.hands">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.showPlayer = hand.name; $ctrl.incrementView()" ng-disabled="hand.name === $ctrl.guessPlayer">{{hand.name}}</button>
 	</div>
-	<div class="form-group row">
-		<label for="guessRoom" class="col-4 col-form-label">Room:</label>
-		<select id="guessRoom" class="col-6 custom-select" ng-model="$ctrl.guessRoom">
-			<option value=""></option>
-			<option ng-repeat="rcard in $ctrl.roomCardOptions" ng-value="rcard">{{rcard}}</option>
-		</select>
-		<div class="col-2"></div>
+	<div>
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.showPlayer = $ctrl.noShowPlayerOption; $ctrl.incrementView()">No one</button>
 	</div>
-	<div class="form-group row">
-		<label for="guessPlayer" class="col-4 col-form-label">Player Guessing:</label>
-		<select id="guessPlayer" class="col-6 custom-select" ng-model="$ctrl.guessPlayer">
-			<option value=""></option>
-			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SUSPECT">
+	<h3>Which suspect was guessed?</h3>
+	<div ng-repeat="pcard in $ctrl.personCardOptions">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessPerson = pcard; $ctrl.incrementView()">{{pcard}}</button>
+	</div>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.WEAPON">
+	<h3>Which weapon was guessed?</h3>
+	<div ng-repeat="wcard in $ctrl.weaponCardOptions">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessWeapon = wcard; $ctrl.incrementView()">{{wcard}}</button>
+	</div>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.ROOM">
+	<h3>Which room was guessed?</h3>
+	<div ng-repeat="rcard in $ctrl.roomCardOptions">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessRoom = rcard; $ctrl.incrementView()">{{rcard}}</button>
+	</div>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SHOWN_CARD">
+	<h3>Which card was shown to you?</h3>
+	<div ng-repeat="card in $ctrl.shownCardOptions()">
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.shownCard = card; $ctrl.incrementView()">{{card}}</button>
+	</div>
+</div>
+
+<div ng-if="$ctrl.currentView === $ctrl.GuessProgression.GUESS_SUMMARY"> 
+	
+	<div>
+		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.startPrompts()">Start New Guess</button>
+	</div>
+	
+	<!-- Summary of guess in list form -->
+	<form id="guessEntryForm">
+		<div class="form-group row">
+			<label for="guessPerson" class="col-4 col-form-label">Person:</label>
+			<select id="guessPerson" class="col-6 custom-select" ng-model="$ctrl.guessPerson">
+				<option value=""></option>
+				<option ng-repeat="pcard in $ctrl.personCardOptions" ng-value="pcard">{{pcard}}</option>
+			</select>
 			<div class="col-2"></div>
-		</select>
-	</div>
-	<div class="form-group row">
-		<label for="showPlayer" class="col-4 col-form-label">Player Showing:</label>
-		<select id="showPlayer" class="col-6 custom-select" ng-model="$ctrl.showPlayer">
-			<option value=""></option>
-			<option ng-value="$ctrl.noShowPlayerOption">No one</option>
-			<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
-		</select>
-		<div class="col-2"></div>
-	</div>
-	<div class="form-group row" ng-if="$ctrl.mainPlayerGuessAndShow()">
-		<label for="shownCard" class="col-4 col-form-label">Card Shown:</label>
-		<select id="shownCard" class="col-6 custom-select" ng-model="$ctrl.shownCard">
-			<option value=""></option>
-			<option ng-repeat="card in $ctrl.shownCardOptions()" ng-value="card">{{card}}</option>
-		</select>
-		<div class="col-2"></div>
-	</div>
-</form>
+		</div>
+		<div class="form-group row">
+			<label for="guessWeapon" class="col-4 col-form-label">Weapon:</label>
+			<select id="guessWeapon" class="col-6 custom-select" ng-model="$ctrl.guessWeapon">
+				<option value=""></option>
+				<option ng-repeat="wcard in $ctrl.weaponCardOptions" ng-value="wcard">{{wcard}}</option>
+			</select>
+			<div class="col-2"></div>
+		</div>
+		<div class="form-group row">
+			<label for="guessRoom" class="col-4 col-form-label">Room:</label>
+			<select id="guessRoom" class="col-6 custom-select" ng-model="$ctrl.guessRoom">
+				<option value=""></option>
+				<option ng-repeat="rcard in $ctrl.roomCardOptions" ng-value="rcard">{{rcard}}</option>
+			</select>
+			<div class="col-2"></div>
+		</div>
+		<div class="form-group row">
+			<label for="guessPlayer" class="col-4 col-form-label">Player Guessing:</label>
+			<select id="guessPlayer" class="col-6 custom-select" ng-model="$ctrl.guessPlayer">
+				<option value=""></option>
+				<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+				<div class="col-2"></div>
+			</select>
+		</div>
+		<div class="form-group row">
+			<label for="showPlayer" class="col-4 col-form-label">Player Showing:</label>
+			<select id="showPlayer" class="col-6 custom-select" ng-model="$ctrl.showPlayer">
+				<option value=""></option>
+				<option ng-value="$ctrl.noShowPlayerOption">No one</option>
+				<option ng-repeat="hand in $ctrl.hands" ng-value="hand.name">{{hand.name}}</option>
+			</select>
+			<div class="col-2"></div>
+		</div>
+		<div class="form-group row" ng-if="$ctrl.mainPlayerGuessAndShow()">
+			<label for="shownCard" class="col-4 col-form-label">Card Shown:</label>
+			<select id="shownCard" class="col-6 custom-select" ng-model="$ctrl.shownCard">
+				<option value=""></option>
+				<option ng-repeat="card in $ctrl.shownCardOptions()" ng-value="card">{{card}}</option>
+			</select>
+			<div class="col-2"></div>
+		</div>
+	</form>
 
-<div class="row">
-	<div class="col-md-6">
-		<h4>Basic Guess Requirements:</h4>
-		<div>
-			<img ng-src="{{$ctrl.completeGuessCards() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-			<p ng-class="{geValid: $ctrl.completeGuessCards(), geInvalid: !$ctrl.completeGuessCards()}">All guess card fields are filled</p>
-		</div>
-		<div>
-			<img ng-src="{{$ctrl.completeGuessPlayers() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-			<p ng-class="{geValid: $ctrl.completeGuessPlayers(), geInvalid: !$ctrl.completeGuessPlayers()}">All player fields are filled</p>
-		</div>
-		<div>
-			<img ng-src="{{$ctrl.guessShowPlayersDifferent() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-			<p ng-class="{geValid: $ctrl.guessShowPlayersDifferent(), geInvalid: !$ctrl.guessShowPlayersDifferent()}">"Guess" and "Show" player fields are not the same</p>
-		</div>
-		<div ng-show="$ctrl.mainPlayerGuessAndShow()">
-			<img ng-src="{{$ctrl.completeShownCard() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
-			<p ng-class="{geValid: $ctrl.completeShownCard(), geInvalid: !$ctrl.completeShownCard()}">The card shown field is filled</p>
-		</div>
-	</div>
-
-	<div class="col-md-6">
-		<h4>Guess Validity Check:</h4>
-		<div ng-if="!$ctrl.basicRequirementsMet()">
-			<p class="geInvalid">Basic guess requirements must be met before checking guess validity</p>
-		</div>
-		<div ng-if="$ctrl.basicRequirementsMet()">
-			<div ng-if="$ctrl.verifyGuessIsValid().length === 0">
-				<img src="img/checkmark.png" class="geValidateIcon">
-				<p class="geValid">Guess is valid</p>
+	<!-- Guess Validation -->
+	<div class="row">
+		<div class="col-md-6">
+			<h4>Basic Guess Requirements:</h4>
+			<div>
+				<img ng-src="{{$ctrl.completeGuessCards() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+				<p ng-class="{geValid: $ctrl.completeGuessCards(), geInvalid: !$ctrl.completeGuessCards()}">All guess card fields are filled</p>
 			</div>
-			<div ng-if="$ctrl.verifyGuessIsValid().length > 0">
-				<div ng-repeat="warn in $ctrl.verifyGuessIsValid()">
-					<img src="img/redx.png" class="geValidateIcon">
-					<p class="geInvalid">{{warn}}</p>
+			<div>
+				<img ng-src="{{$ctrl.completeGuessPlayers() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+				<p ng-class="{geValid: $ctrl.completeGuessPlayers(), geInvalid: !$ctrl.completeGuessPlayers()}">All player fields are filled</p>
+			</div>
+			<div>
+				<img ng-src="{{$ctrl.guessShowPlayersDifferent() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+				<p ng-class="{geValid: $ctrl.guessShowPlayersDifferent(), geInvalid: !$ctrl.guessShowPlayersDifferent()}">"Guess" and "Show" player fields are not the same</p>
+			</div>
+			<div ng-show="$ctrl.mainPlayerGuessAndShow()">
+				<img ng-src="{{$ctrl.completeShownCard() && 'img/checkmark.png' || 'img/redx.png'}}" class="geValidateIcon">
+				<p ng-class="{geValid: $ctrl.completeShownCard(), geInvalid: !$ctrl.completeShownCard()}">The card shown field is filled</p>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<h4>Guess Validity Check:</h4>
+			<div ng-if="!$ctrl.basicRequirementsMet()">
+				<p class="geInvalid">Basic guess requirements must be met before checking guess validity</p>
+			</div>
+			<div ng-if="$ctrl.basicRequirementsMet()">
+				<div ng-if="$ctrl.verifyGuessIsValid().length === 0">
+					{{$ctrl.verifyGuessIsValid().length}}
+					<img src="img/checkmark.png" class="geValidateIcon">
+					<p class="geValid">Guess is valid</p>
+				</div>
+				<div ng-if="$ctrl.verifyGuessIsValid().length > 0">
+					{{$ctrl.verifyGuessIsValid().length}}
+					<div ng-repeat="warn in $ctrl.verifyGuessIsValid()">
+						<img src="img/redx.png" class="geValidateIcon">
+						<p class="geInvalid">{{warn}}</p>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div>
-	<button class="btn btn-primary btn-block" ng-click="$ctrl.addGuess()" ng-disabled="!$ctrl.validateAllInputs()">Add Guess</button>
+	<!-- Add Guess Button -->
+	<div>
+		<button class="btn btn-primary btn-block" ng-click="$ctrl.addGuess()" ng-disabled="!$ctrl.validateAllInputs()">Add Guess</button>
+	</div>
 </div>

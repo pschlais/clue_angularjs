@@ -15,7 +15,8 @@ const CardHeld = {
 const BadGuessCode = {
 	PASS_PLAYER_HAS_CARD: 1,
 	NO_POSSIBLE_CARDS_IN_HAND: 2,
-	PLAYER_CANT_SHOW_THAT_CARD: 3
+	PLAYER_CANT_SHOW_THAT_CARD: 3,
+	//PLAYER_MUST_HAVE_ALL_GUESS_CARDS: 4,
 };
 
 
@@ -1065,9 +1066,10 @@ var ClueUtil = (function() {
 
 		let passHands = allHands.concat(allHands).slice(i_guessHand + 1, i_showHand);
 
-		//---- (1) check if all cards in the guess are known not to be in the show-er's hand
+		//---- (1) check if all cards in the guess are known not to be in the show-er's hand (don't check
+		//         if no one showed [guess.showHand === null])
 		let sh = guess.showHand;
-		if (sh.checkCardStatus(guess.person) === CardHeld.NO &&
+		if (sh !== null && sh.checkCardStatus(guess.person) === CardHeld.NO &&
 			sh.checkCardStatus(guess.weapon) === CardHeld.NO &&
 			sh.checkCardStatus(guess.room) === CardHeld.NO) {
 			//invalid guess since player said to show a card is known not to have any of the cards
@@ -1087,7 +1089,7 @@ var ClueUtil = (function() {
 		});
 
 		//---- (3) if it is a main player guess, check that the shown card can actually be in that player's hand
-		if (guess.shownCard !== null) {
+		if (guess.guessHand.mainPlayer && guess.shownCard !== null) {
 			if(guess.shownCard.isHolderKnown() && guess.shownCard.parentHand !== guess.showHand) {
 				//card is known to be in a hand that isn't the show-er, so it must be invalid
 				returnObj.validGuess = false;
@@ -1095,6 +1097,25 @@ var ClueUtil = (function() {
 												  cards: [guess.shownCard]});
 			}
 		}
+
+		/*
+		//---- (4) if it is a guess where no one shows and all the guess card's holders are known,
+		//         make sure they are all in the guesser's hand
+		if (guess.showHand === null &&
+			guess.person.isHolderKnown() &&
+			guess.weapon.isHolderKnown() &&
+			guess.room.isHolderKnown()) {
+
+			[guess.person, guess.weapon, guess.room].forEach(function(guessCard) {
+				if (guessCard.parentHand !== guess.guessHand) {
+					//card needs to be in the guess hand
+					returnObj.validGuess = false;
+					returnobj.invalidComponents.push({code: BadGuessCode.PLAYER_MUST_HAVE_ALL_GUESS_CARDS,
+													  cards: [guessCard]});
+				}
+			});
+		}
+		*/
 
 		//return results
 		return returnObj;
@@ -1141,7 +1162,11 @@ var ClueUtil = (function() {
 					//print that the card is known to be held by someone else
 					problemStrings.push(ic.cards[0].name +" can't be shown by this player because it " +
 						"is known to be held by " + ic.cards[0].parentHand.name);
-				}
+				} /* else if (ic.code === BadGuessCode.PLAYER_MUST_HAVE_ALL_GUESS_CARDS) {
+					//print that the card is known to be held by someone else
+					problemStrings.push(ic.cards[0].name + " is known to be in " + ic.cards[0].parentHand.name
+						+ "'s hand. If no one showed a card, it would need to be in the guessing player's hand.")
+				} */
 			});
 
 			return problemStrings;
