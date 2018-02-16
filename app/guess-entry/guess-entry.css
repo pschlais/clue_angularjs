@@ -8,6 +8,9 @@
 
 .geGuessBtn {
 	margin: 5px auto;
+	color: #0033cc;
+	background-color: #f0f0f0;
+	border: #007bff 2px solid;
 }
 
 .geValidateIcon {
