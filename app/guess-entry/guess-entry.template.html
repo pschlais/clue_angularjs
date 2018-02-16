@@ -133,12 +133,10 @@
 			</div>
 			<div ng-if="$ctrl.basicRequirementsMet()">
 				<div ng-if="$ctrl.verifyGuessIsValid().length === 0">
-					{{$ctrl.verifyGuessIsValid().length}}
 					<img src="img/checkmark.png" class="geValidateIcon">
 					<p class="geValid">Guess is valid</p>
 				</div>
 				<div ng-if="$ctrl.verifyGuessIsValid().length > 0">
-					{{$ctrl.verifyGuessIsValid().length}}
 					<div ng-repeat="warn in $ctrl.verifyGuessIsValid()">
 						<img src="img/redx.png" class="geValidateIcon">
 						<p class="geInvalid">{{warn}}</p>
