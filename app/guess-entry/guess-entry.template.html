@@ -3,52 +3,52 @@
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.GUESSING_PLAYER">
 	<h3>Which player made a guess?</h3>
 	<div ng-repeat="hand in $ctrl.hands">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessPlayer = hand.name; $ctrl.incrementView()">{{hand.name}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.guessPlayer = hand.name; $ctrl.incrementView()">{{hand.name}}</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SHOWING_PLAYER">
 	<h3>Which player showed a card?</h3>
 	<div ng-repeat="hand in $ctrl.hands">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.showPlayer = hand.name; $ctrl.incrementView()" ng-disabled="hand.name === $ctrl.guessPlayer">{{hand.name}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.showPlayer = hand.name; $ctrl.incrementView()" ng-disabled="hand.name === $ctrl.guessPlayer">{{hand.name}}</button>
 	</div>
 	<div>
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.showPlayer = $ctrl.noShowPlayerOption; $ctrl.incrementView()">No one</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.showPlayer = $ctrl.noShowPlayerOption; $ctrl.incrementView()">No one</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SUSPECT">
 	<h3>Which suspect was guessed?</h3>
 	<div ng-repeat="pcard in $ctrl.personCardOptions">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessPerson = pcard; $ctrl.incrementView()">{{pcard}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.guessPerson = pcard; $ctrl.incrementView()">{{pcard}}</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.WEAPON">
 	<h3>Which weapon was guessed?</h3>
 	<div ng-repeat="wcard in $ctrl.weaponCardOptions">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessWeapon = wcard; $ctrl.incrementView()">{{wcard}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.guessWeapon = wcard; $ctrl.incrementView()">{{wcard}}</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.ROOM">
 	<h3>Which room was guessed?</h3>
 	<div ng-repeat="rcard in $ctrl.roomCardOptions">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.guessRoom = rcard; $ctrl.incrementView()">{{rcard}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.guessRoom = rcard; $ctrl.incrementView()">{{rcard}}</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.SHOWN_CARD">
 	<h3>Which card was shown to you?</h3>
 	<div ng-repeat="card in $ctrl.shownCardOptions()">
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.shownCard = card; $ctrl.incrementView()">{{card}}</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.shownCard = card; $ctrl.incrementView()">{{card}}</button>
 	</div>
 </div>
 
 <div ng-if="$ctrl.currentView === $ctrl.GuessProgression.GUESS_SUMMARY"> 
 	
 	<div>
-		<button class="btn btn-block geGuessBtn" ng-click="$ctrl.startPrompts()">Start New Guess</button>
+		<button class="btn btn-outline-primary btn-block geGuessBtn" ng-click="$ctrl.startPrompts()">Start New Guess</button>
 	</div>
 	
 	<!-- Summary of guess in list form -->
